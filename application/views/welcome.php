@@ -9,16 +9,16 @@ $(function(){
     mtype: 'POST',
     colNames:['id','parrent_id', 'type_id','name','code','type'],
     colModel :[ 
-      {name:'id', index:'id', width:55}, 
-      {name:'parrent_id', index:'parrent_id', width:90}, 
-      {name:'type_id', index:'type_id', width:80, align:'right'}, 
+      {name:'id', index:'id', width:10}, 
+      {name:'parrent_id', index:'parrent_id', width:10}, 
+      {name:'type_id', index:'type_id', width:10, align:'right'}, 
       {name:'name', index:'name', width:80, align:'right'}, 
-      {name:'code', index:'code', width:80, align:'right'}, 
-      {name:'type', index:'type', width:150, sortable:false} 
+      {name:'code', index:'code', width:180, align:'right'}, 
+      {name:'type', index:'type', width:80,align:'right'}
     ],
     pager: '#pager',
-    rowNum:10,
-    rowList:[10,20,30],
+    rowNum:50,
+    rowList:[10,30,50,100,500],
     sortname: 'id',
     sortorder: 'desc',
     viewrecords: true,

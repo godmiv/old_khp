@@ -64,8 +64,9 @@ $s .= "<records>".$count."</records>";
  
 // be sure to put text data in CDATA
 foreach($result as $row){
-	$s .= "<row id='". $row['id']."'>";            
-    $s .= "<cell>". $row['parrent_id']."</cell>";
+	$s .= "<row id='". $row['id']."'>";
+    $s .= "<cell>". $row['id']."</cell>";
+	$s .= "<cell>". $row['parrent_id']."</cell>";
     $s .= "<cell>". $row['type_id']."</cell>";
     $s .= "<cell>". $row['name']."</cell>";
     $s .= "<cell>". $row['code']."</cell>";
