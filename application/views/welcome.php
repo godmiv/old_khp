@@ -24,6 +24,7 @@ $(function(){
     viewrecords: true,
     gridview: true,
     caption: 'My first grid',
+	autowidth: true,
     subGrid: true,
     subGridRowExpanded: function(subgrid_id, row_id){
     // we pass two parameters
@@ -51,7 +52,8 @@ $(function(){
           height: '100%',
           rowNum:20,
           sortname: 'id',
-          sortorder: "asc"
+          sortorder: "asc",
+		  autowidth: true
        });
    }
   }); 
