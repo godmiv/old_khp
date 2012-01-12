@@ -1,3 +1,10 @@
+<STYLE>
+
+        .cvteste {
+            background-color: green !important;
+        }
+
+</STYLE>
 <pre>
 <?php print_r($test);?>
 </pre>
@@ -13,7 +20,7 @@ $(function(){
 		{name:'parrent_id', index:'parrent_id', width:10}, 
 		{name:'type_id', index:'type_id', width:10, align:'right'}, 
 		{name:'name', index:'name', width:80, align:'right'}, 
-		{name:'code', index:'code', width:180, align:'right'}, 
+		{name:'code', index:'code', width:180, align:'right',classes: 'cvteste'}, 
 		{name:'type', index:'type', width:80,align:'right'}
     ],
     pager: '#pager',
@@ -52,8 +59,8 @@ $(function(){
           height: '100%',
           rowNum:20,
           sortname: 'id',
-          sortorder: "asc",
-		  autowidth: true
+          sortorder: "asc"
+		  //autowidth: true
        });
    }
   }); 

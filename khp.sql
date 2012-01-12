@@ -7,6 +7,8 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
+DROP DATABASE IF EXISTS `khp`;
+
 CREATE DATABASE `khp`
     CHARACTER SET 'utf8'
     COLLATE 'utf8_general_ci';
@@ -16,6 +18,8 @@ USE `khp`;
 #
 # Structure for the `codifier_divisions` table : 
 #
+
+DROP TABLE IF EXISTS `codifier_divisions`;
 
 CREATE TABLE `codifier_divisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -28,6 +32,8 @@ CREATE TABLE `codifier_divisions` (
 # Structure for the `codifier_tasks` table : 
 #
 
+DROP TABLE IF EXISTS `codifier_tasks`;
+
 CREATE TABLE `codifier_tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -39,6 +45,8 @@ CREATE TABLE `codifier_tasks` (
 #
 # Structure for the `products` table : 
 #
+
+DROP TABLE IF EXISTS `products`;
 
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -53,6 +61,8 @@ CREATE TABLE `products` (
 # Structure for the `products_types` table : 
 #
 
+DROP TABLE IF EXISTS `products_types`;
+
 CREATE TABLE `products_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -62,6 +72,8 @@ CREATE TABLE `products_types` (
 #
 # Structure for the `tasks` table : 
 #
+
+DROP TABLE IF EXISTS `tasks`;
 
 CREATE TABLE `tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -105,7 +117,8 @@ COMMIT;
 
 INSERT INTO `products` (`id`, `parrent_id`, `type_id`, `name`, `code`) VALUES 
   (1,0,1,'Матрица','890-7680-1234-001'),
-  (2,1,2,'Электрод','856-1234-5678');
+  (2,1,2,'Электрод','856-1234-5678'),
+  (3,0,1,'Пуансон','890-7680-1234-002');
 
 COMMIT;
 
