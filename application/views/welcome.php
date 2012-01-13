@@ -1,10 +1,9 @@
 <STYLE>
-
-        .cvteste {
-            background-color: green !important;
-        }
-
+.cvteste{
+	background-color: gray !important;
+}
 </STYLE>
+
 <pre>
 <?php print_r($test);?>
 </pre>
@@ -14,14 +13,15 @@ $(function(){
     url:'jgrid/test',
     datatype: 'xml',
     mtype: 'POST',
-    colNames:['id','parrent_id', 'type_id','name','code','type'],
+    colNames:['Actions','id','parrent_id','type_id','name','code','type'],
     colModel :[ 
+		{name:'act',index:'act', width:75,sortable:false},
 		{name:'id', index:'id', width:10}, 
 		{name:'parrent_id', index:'parrent_id', width:10}, 
 		{name:'type_id', index:'type_id', width:10, align:'right'}, 
-		{name:'name', index:'name', width:80, align:'right'}, 
-		{name:'code', index:'code', width:180, align:'right',classes: 'cvteste'}, 
-		{name:'type', index:'type', width:80,align:'right'}
+		{name:'name', index:'name', width:80, align:'right',editable:true}, 
+		{name:'code', index:'code', width:180, align:'right',editable:true},//classes: 'cvteste'}, 
+		{name:'type', index:'type', width:80,align:'right',editable:true}
     ],
     pager: '#pager',
     rowNum:50,
@@ -33,6 +33,25 @@ $(function(){
     caption: 'My first grid',
 	autowidth: true,
     subGrid: true,
+	gridComplete: function(){
+		var ids = jQuery("#list").jqGrid('getDataIDs');
+		for(var i=0;i < ids.length;i++){
+			var cl = ids[i];
+			be = "<input style='height:22px;width:20px;' type='button' value='E' onclick=\"jQuery('#list').editRow('"+cl+"');\"  />";
+			se = "<input style='height:22px;width:20px;' type='button' value='S' onclick=\"jQuery('#list').saveRow('"+cl+"');\"  />";
+			ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"jQuery('#list').restoreRow('"+cl+"');\" />";
+			jQuery("#list").jqGrid('setRowData',ids[i],{act:be+se+ce});
+			
+			//тест раскраски строки в зависимости от значения какойнибудь ячейки
+			var status = jQuery("#list").getRowData(ids[i]).name;
+			if(status == "Пуансон"){
+				$("#"+ids[i]).find("td").css("background-color", "green");
+				$("#"+ids[i]).find("td").css("color", "silver");
+			}
+			//alert (status);
+		}
+	},
+	editurl: "jgrid/test",
     subGridRowExpanded: function(subgrid_id, row_id){
     // we pass two parameters
     // subgrid_id is a id of the div tag created within a table
@@ -47,9 +66,10 @@ $(function(){
           url:"jgrid/test/"+row_id,
           datatype: "xml",
 		  mtype: 'POST',
-          colNames:['id','parrent_id', 'type_id','name','code','type'],
+          colNames:['Actions','id','parrent_id', 'type_id','name','code','type'],
           colModel: [
-			  {name:'id', index:'id', width:10}, 
+			  {name:'act',index:'act', width:75,sortable:false},
+			  {name:'id', index:'id', width:10},
 			  {name:'parrent_id', index:'parrent_id', width:10}, 
 			  {name:'type_id', index:'type_id', width:10, align:'right'}, 
 			  {name:'name', index:'name', width:80, align:'right'}, 
