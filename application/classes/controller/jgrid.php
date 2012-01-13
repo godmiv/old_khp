@@ -66,6 +66,7 @@ class Controller_jgrid extends Controller {
 		// be sure to put text data in CDATA
 		foreach($result as $row){
 			$s .= "<row id='". $row['id']."'>";
+			$s .= "<cell></cell>"; //это для пустой колонки Actions - если не передать пустое значение -в jqgrid колонки сдвигаются, получается каша
 			$s .= "<cell>". $row['id']."</cell>";
 			$s .= "<cell>". $row['parrent_id']."</cell>";
 			$s .= "<cell>". $row['type_id']."</cell>";
