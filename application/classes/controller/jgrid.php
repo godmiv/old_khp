@@ -51,7 +51,15 @@ class Controller_jgrid extends Controller {
 		// if for some reasons start position is negative set it to 0 
 		// typical case is that the user type 0 for the requested page 
 		if($start <0) $start = 0; 
-		$query = 'SELECT products.*, products_types.name as type FROM products LEFT JOIN products_types ON products.type_id=products_types.id where products.parrent_id= '.$parrent_id.' ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
+		$query = 'SELECT
+			products.id as id,
+			products.name as name,
+			products.code as code,
+			products_types.name as type
+			FROM products 
+			LEFT JOIN products_types 
+			ON products.type_id=products_types.id 
+			WHERE products.parrent_id= '.$parrent_id.' ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
 		// we should set the appropriate header information. Do not forget this.
@@ -67,25 +75,16 @@ class Controller_jgrid extends Controller {
 		foreach($result as $row){
 			$s .= "<row id='". $row['id']."'>";
 			$s .= "<cell></cell>"; //это для пустой колонки Actions - если не передать пустое значение -в jqgrid колонки сдвигаются, получается каша
-			$s .= "<cell>". $row['id']."</cell>";
-			$s .= "<cell>". $row['parrent_id']."</cell>";
-			$s .= "<cell>". $row['type_id']."</cell>";
-			$s .= "<cell>". $row['name']."</cell>";
-			$s .= "<cell>". $row['code']."</cell>";
-			$s .= "<cell>". $row['type']."</cell>";
+			$s .= "<cell><![CDATA[". $row['id']."]]></cell>";
+			//$s .= "<cell><![CDATA[". $row['parrent_id']."]]></cell>";
+			//$s .= "<cell><![CDATA[". $row['type_id']."]]></cell>";
+			$s .= "<cell><![CDATA[". $row['name']."]]></cell>";
+			$s .= "<cell><![CDATA[". $row['code']."]]></cell>";
+			$s .= "<cell><![CDATA[". $row['type']."]]></cell>";
 			$s .= "</row>";
 		}
 		$s .= "</rows>";
 		$this->response->body($s);
-	}
-
-	public function action_index()
-	{
-		//$query = 'SHOW TABLES';
-		$query = 'SELECT products.*, products_types.name as type FROM products LEFT JOIN products_types ON products.type_id=products_types.id where products.parrent_id=0';
-		$data['test'] = DB::query(Database::SELECT,$query)->execute()->as_array();
-		$data['test']->count();
-		$this->template->content = View::factory('welcome',$data);
 	}
 
 } // End Welcome
