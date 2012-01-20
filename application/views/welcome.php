@@ -51,7 +51,7 @@ $(function(){
 			//alert (status);
 		}
 	},
-	editurl: "jgrid/test",
+	editurl: "jgrid/save",
 	subGridRowExpanded: function(subgrid_id, row_id){
     // we pass two parameters
     // subgrid_id is a id of the div tag created within a table
@@ -116,6 +116,7 @@ $(function(){
 
 <table id="list4"></table>
 <script type="text/javascript">
+/*
 var lastsel;
 jQuery("#list4").jqGrid({
 	datatype: "local",
@@ -150,4 +151,5 @@ var mydata = [
 		];
 for(var i=0;i<=mydata.length;i++)
 	jQuery("#list4").jqGrid('addRowData',i+1,mydata[i]);
+*/
 </script>

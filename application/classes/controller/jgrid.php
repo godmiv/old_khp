@@ -86,5 +86,18 @@ class Controller_jgrid extends Controller {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
-
+	public function action_save()
+	{
+		$post = arr::extract($_POST, array('id','name','code','type'));
+		$query = DB::update('products')->set(array('name' => $post['name'], 'code'=>$post['code']))->where('id', '=', $post['id']);
+		$query->execute();
+	}
+	public function action_add()
+	{
+		
+	}
+	public function action_del()
+	{
+		
+	}
 } // End Welcome
