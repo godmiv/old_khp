@@ -1,26 +1,25 @@
-# EMS MySQL Manager Pro 3.2.0.1
-# ---------------------------------------
-# Host     : sapr02
-# Port     : 3306
-# Database : khp
+-- MySQL dump 10.10
+--
+-- Host: sapr02    Database: khp
+-- ------------------------------------------------------
+-- Server version	5.1.12-beta-community-nt
 
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-SET FOREIGN_KEY_CHECKS=0;
-
-DROP DATABASE IF EXISTS `khp`;
-
-CREATE DATABASE `khp`
-    CHARACTER SET 'utf8'
-    COLLATE 'utf8_general_ci';
-
-USE `khp`;
-
-#
-# Structure for the `codifier_divisions` table : 
-#
+--
+-- Table structure for table `codifier_divisions`
+--
 
 DROP TABLE IF EXISTS `codifier_divisions`;
-
 CREATE TABLE `codifier_divisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -28,12 +27,21 @@ CREATE TABLE `codifier_divisions` (
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
-#
-# Structure for the `codifier_tasks` table : 
-#
+--
+-- Dumping data for table `codifier_divisions`
+--
+
+LOCK TABLES `codifier_divisions` WRITE;
+/*!40000 ALTER TABLE `codifier_divisions` DISABLE KEYS */;
+INSERT INTO `codifier_divisions` VALUES (1,'РџР”Рћ'),(2,'РўРћРњРћ'),(3,'12/1'),(4,'12/2'),(5,'12/3'),(6,'12/7');
+/*!40000 ALTER TABLE `codifier_divisions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `codifier_tasks`
+--
 
 DROP TABLE IF EXISTS `codifier_tasks`;
-
 CREATE TABLE `codifier_tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -42,12 +50,21 @@ CREATE TABLE `codifier_tasks` (
   KEY `id_division` (`division_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
-#
-# Structure for the `products` table : 
-#
+--
+-- Dumping data for table `codifier_tasks`
+--
+
+LOCK TABLES `codifier_tasks` WRITE;
+/*!40000 ALTER TABLE `codifier_tasks` DISABLE KEYS */;
+INSERT INTO `codifier_tasks` VALUES (1,'РўРµС…РЅРѕР»РѕРіРёС‡РµСЃРєР°СЏ РїСЂРѕСЂР°Р±РѕС‚РєР°',2),(2,'Р—Р°РєР°Р· РјР°С‚РµСЂРёР°Р»РѕРІ',1),(3,'РР·РіРѕС‚РѕРІР»РµРЅРёРµ',3),(4,'РџСЂРѕРіСЂР°РјРјС‹ Р§РџРЈ',2);
+/*!40000 ALTER TABLE `codifier_tasks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `products`
+--
 
 DROP TABLE IF EXISTS `products`;
-
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parrent_id` int(11) NOT NULL DEFAULT '0',
@@ -57,24 +74,42 @@ CREATE TABLE `products` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
-#
-# Structure for the `products_types` table : 
-#
+--
+-- Dumping data for table `products`
+--
+
+LOCK TABLES `products` WRITE;
+/*!40000 ALTER TABLE `products` DISABLE KEYS */;
+INSERT INTO `products` VALUES (1,0,1,'РњР°С‚СЂРёС†Р°','890-7680-1234-001'),(2,1,2,'Р­Р»РµРєС‚СЂРѕРґ','856-1234-5678'),(3,0,1,'РџСѓР°РЅСЃРѕРЅ','890-7680-1234-002'),(4,1,2,'РЁР°Р±Р»РѕРЅ','856-1235-5678');
+/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `products_types`
+--
 
 DROP TABLE IF EXISTS `products_types`;
-
 CREATE TABLE `products_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
-#
-# Structure for the `tasks` table : 
-#
+--
+-- Dumping data for table `products_types`
+--
+
+LOCK TABLES `products_types` WRITE;
+/*!40000 ALTER TABLE `products_types` DISABLE KEYS */;
+INSERT INTO `products_types` VALUES (1,'РћСЃРЅР°СЃС‚РєР°'),(2,'Р2Рџ');
+/*!40000 ALTER TABLE `products_types` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tasks`
+--
 
 DROP TABLE IF EXISTS `tasks`;
-
 CREATE TABLE `tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `codifier_id` int(11) DEFAULT NULL,
@@ -85,65 +120,23 @@ CREATE TABLE `tasks` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
-#
-# Data for the `codifier_divisions` table  (LIMIT 0,500)
-#
+--
+-- Dumping data for table `tasks`
+--
 
-INSERT INTO `codifier_divisions` (`id`, `name`) VALUES 
-  (1,'ПДО'),
-  (2,'ТОМО'),
-  (3,'12/1'),
-  (4,'12/2'),
-  (5,'12/3'),
-  (6,'12/7');
+LOCK TABLES `tasks` WRITE;
+/*!40000 ALTER TABLE `tasks` DISABLE KEYS */;
+INSERT INTO `tasks` VALUES (1,1,'2011-12-21 00:00:00',NULL,1,1),(2,2,NULL,NULL,2,1),(3,3,NULL,NULL,3,1),(4,1,NULL,NULL,1,2),(5,4,NULL,NULL,2,2),(6,3,NULL,NULL,3,2),(7,2,NULL,NULL,4,2);
+/*!40000 ALTER TABLE `tasks` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-COMMIT;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-#
-# Data for the `codifier_tasks` table  (LIMIT 0,500)
-#
-
-INSERT INTO `codifier_tasks` (`id`, `name`, `division_id`) VALUES 
-  (1,'Технологическая проработка',2),
-  (2,'Заказ материалов',1),
-  (3,'Изготовление',3),
-  (4,'Программы ЧПУ',2);
-
-COMMIT;
-
-#
-# Data for the `products` table  (LIMIT 0,500)
-#
-
-INSERT INTO `products` (`id`, `parrent_id`, `type_id`, `name`, `code`) VALUES 
-  (1,0,1,'Матрица','890-7680-1234-001'),
-  (2,1,2,'Электрод','856-1234-5678'),
-  (3,0,1,'Пуансон','890-7680-1234-002');
-
-COMMIT;
-
-#
-# Data for the `products_types` table  (LIMIT 0,500)
-#
-
-INSERT INTO `products_types` (`id`, `name`) VALUES 
-  (1,'Оснастка'),
-  (2,'И2П');
-
-COMMIT;
-
-#
-# Data for the `tasks` table  (LIMIT 0,500)
-#
-
-INSERT INTO `tasks` (`id`, `codifier_id`, `start`, `end`, `number`, `product_id`) VALUES 
-  (1,1,'2011-12-21 00:00:00',NULL,1,1),
-  (2,2,NULL,NULL,2,1),
-  (3,3,NULL,NULL,3,1),
-  (4,1,NULL,NULL,1,2),
-  (5,4,NULL,NULL,2,2),
-  (6,3,NULL,NULL,3,2),
-  (7,2,NULL,NULL,4,2);
-
-COMMIT;
-
+-- Dump completed on 2012-01-17  9:24:41
