@@ -68,7 +68,7 @@ $(function(){
 			mtype: 'POST',
 			colNames:['Actions','id',/*'parrent_id', 'type_id',*/'name','code','type'],
 			colModel: [
-				{name:'act',index:'act', width:75,sortable:false},
+				{name:'act',index:'act', width:60,sortable:false},
 				{name:'id', index:'id', width:10},
 				//{name:'parrent_id', index:'parrent_id', width:10}, 
 				//{name:'type_id', index:'type_id', width:10, align:'right'}, 
@@ -83,7 +83,7 @@ $(function(){
 			autowidth: true,
 			viewrecords: true,
 			gridview: true,
-			editurl: "jgrid/test"+row_id,
+			editurl: "jgrid/save/"+row_id,
 			gridComplete: function(){
 				var ids = jQuery("#"+subgrid_table_id).jqGrid('getDataIDs');
 				for(var i=0;i < ids.length;i++){

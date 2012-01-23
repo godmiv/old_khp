@@ -12,5 +12,10 @@ class Controller_Welcome extends Controller_Template {
 		$data['test'] = 'test jqgrid';
 		$this->template->content = View::factory('welcome',$data);
 	}
+	public function action_gantt()
+	{
+		$data['test'] = 'test gantt';
+		$this->template->content = View::factory('gantt',$data);
+	}
 
 } // End Welcome
