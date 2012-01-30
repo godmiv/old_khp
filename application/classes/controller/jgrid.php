@@ -7,6 +7,7 @@ class Controller_jgrid extends Controller {
 		if($this->request->param('id') == '') $parrent_id = 0;
 		else $parrent_id = $this->request->param('id');
 		$this->auto_render = false;
+		
 		// to the url parameter are added 4 parameters as described in colModel
 		// we should get these parameters to construct the needed query
 		// Since we specify in the options of the grid that we will use a GET method 
@@ -36,9 +37,9 @@ class Controller_jgrid extends Controller {
 
 		// calculate the total pages for the query 
 		if( $count > 0 && $limit > 0) { 
-					  $total_pages = ceil($count/$limit); 
+			$total_pages = ceil($count/$limit); 
 		} else { 
-					  $total_pages = 0; 
+			$total_pages = 0; 
 		} 
 
 		// if for some reasons the requested page is greater than the total 
