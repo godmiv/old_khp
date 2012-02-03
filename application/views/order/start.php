@@ -1,11 +1,38 @@
 <script type="text/javascript">
-//$("select[name='osin']").change(
-$("test").click(
-	function(){
-		$('#instr').show()
-	}
-)
+$(document).ready(function(){
+	if($("#instrument :selected").val()=='O'); $("#instrument").hide();
+	$("#osin").change(
+		function(){
+			if(this.value != 'O') $("#instrument").show();
+			else $("#instrument").hide();
+		}
+	)
+});
 </script>
+<script type="text/javascript">
+$(function(){ 
+jQuery("#grid").jqGrid({        
+    url:'../jgrid/order',
+    datatype: 'xml',
+    mtype: 'POST',
+   	colNames:["<?php echo implode('","',$columns);?>"],
+   	colModel:[
+		<?php foreach($columns as $col):?>
+		{name:'<?=$col;?>',index:'<?=$col;?>',width:75},
+		<?php endforeach;?>
+   	],
+   	rowNum:10,
+   	rowList:[10,20,30],
+   	pager: '#pager',
+   	sortname: 'id',
+    viewrecords: true,
+    sortorder: "desc",
+    caption:"Simple data manipulation",
+	autowidth: true
+}).navGrid("#pager",{edit:true,add:true,del:true});
+});
+</script>
+
 <?php
 echo $title;
 echo form::open();
@@ -13,7 +40,7 @@ echo form::open();
 <table>
 	<?php
 	foreach ($form_all as $field){
-		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::select($field['name'],$field['options'],$field['attr']['selected']).'</td></tr>';
+		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::select($field['name'],$field['options'],$field['attr']['selected'],$field['attr']).'</td></tr>';
 	}
 	?>
 </table>
@@ -24,7 +51,7 @@ echo form::open();
 	}
 	?>
 </table>
-<div id="instr" style="visibility: hidden">
+<div id="instrument">
 	<table>
 	<?php
 	foreach ($form_ins as $field){
@@ -33,4 +60,20 @@ echo form::open();
 	?>		
 	</table>
 </div>
-<input type="button" id="test" value="test"/>
+<?php
+$h = new Model_helper;
+$str = '890-8371-9999x-001';
+echo $str.'</br>';
+echo $h->instrIncr($str);
+foreach ($h->instrCod() as $key=>$val){
+	$options[$val['kods']] = $val['name'].' ('.$val['kods'].')';
+}
+echo form::select('osin', $options);
+?>
+
+<table id="grid"></table>
+<div id="pager"></div>
+
+<pre>
+<?php print_r($h->instrCod('kod'));?>
+</pre>

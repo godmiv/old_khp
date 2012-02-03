@@ -24,15 +24,19 @@ class Controller_Order extends Controller_Template {
 			'osin'=>array(
 				'name'=>'osin',
 				'options'=>array(
-					NULL=>'','O'=>'Оснастка','E'=>'Электрод','S'=>'Шаблон','K'=>'Копир'
+					//NULL=>'','O'=>'Оснастка','E'=>'Электрод','S'=>'Шаблон','K'=>'Копир'
+					'O'=>'Оснастка','E'=>'Электрод','S'=>'Шаблон','K'=>'Копир'
 					),
 				'attr'=>array(
 					'desc'=>'Тип изделия',
-					'selected'=>NULL
+					'selected'=>'O',
+					'id'=>'osin',
 					)
 				)
 			);
-
+		$query = 'SELECT * FROM orders LIMIT 1';
+		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+		$data['columns'] = array_keys($result[0]);
 		$this->template->content = View::factory('order/start',$data);
 	}
 }
