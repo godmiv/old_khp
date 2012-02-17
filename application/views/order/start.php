@@ -3,10 +3,11 @@ $(document).ready(function(){
 	if($("#instrument :selected").val()=='O'); $("#instrument").hide();
 	$("#osin").change(
 		function(){
-			if(this.value != 'O') $("#instrument").show();
+			if(this.value != '0') $("#instrument").show();
 			else $("#instrument").hide();
 		}
 	)
+	
 });
 </script>
 <script type="text/javascript">
@@ -39,9 +40,11 @@ echo form::open();
 ?>
 <table>
 	<?php
+	/*
 	foreach ($form_all as $field){
 		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::select($field['name'],$field['options'],$field['attr']['selected'],$field['attr']).'</td></tr>';
 	}
+	 */
 	?>
 </table>
 <table>
@@ -61,19 +64,11 @@ echo form::open();
 	</table>
 </div>
 <?php
-$h = new Model_helper;
-$str = '890-8371-9999x-001';
-echo $str.'</br>';
-echo $h->instrIncr($str);
-foreach ($h->instrCod() as $key=>$val){
-	$options[$val['kods']] = $val['name'].' ('.$val['kods'].')';
+foreach ($codifier_instr as $item){
+	$opt[$item['numstart']]= $item['name'].'    ('.$item['numstart'].')';
 }
-echo form::select('osin', $options);
+echo form::select('osin', $opt, '', array('id'=>'osin'));
 ?>
 
 <table id="grid"></table>
 <div id="pager"></div>
-
-<pre>
-<?php print_r($h->instrCod('kod'));?>
-</pre>

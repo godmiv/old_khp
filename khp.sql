@@ -1,25 +1,22 @@
--- MySQL dump 10.10
---
--- Host: sapr02    Database: khp
--- ------------------------------------------------------
--- Server version	5.1.12-beta-community-nt
+# EMS MySQL Manager Pro 3.2.0.1
+# ---------------------------------------
+# Host     : sapr02
+# Port     : 3306
+# Database : khp
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `codifier_divisions`
---
+SET FOREIGN_KEY_CHECKS=0;
 
-DROP TABLE IF EXISTS `codifier_divisions`;
+CREATE DATABASE `khp`
+    CHARACTER SET 'utf8'
+    COLLATE 'utf8_general_ci';
+
+USE `khp`;
+
+#
+# Structure for the `codifier_divisions` table : 
+#
+
 CREATE TABLE `codifier_divisions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -27,21 +24,23 @@ CREATE TABLE `codifier_divisions` (
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
---
--- Dumping data for table `codifier_divisions`
---
+#
+# Structure for the `codifier_instr` table : 
+#
 
-LOCK TABLES `codifier_divisions` WRITE;
-/*!40000 ALTER TABLE `codifier_divisions` DISABLE KEYS */;
-INSERT INTO `codifier_divisions` VALUES (1,'РџР”Рћ'),(2,'РўРћРњРћ'),(3,'12/1'),(4,'12/2'),(5,'12/3'),(6,'12/7');
-/*!40000 ALTER TABLE `codifier_divisions` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE `codifier_instr` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `numstart` int(11) DEFAULT NULL,
+  `numend` int(11) DEFAULT NULL,
+  `sokr` char(5) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `codifier_tasks`
---
+#
+# Structure for the `codifier_tasks` table : 
+#
 
-DROP TABLE IF EXISTS `codifier_tasks`;
 CREATE TABLE `codifier_tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -50,21 +49,31 @@ CREATE TABLE `codifier_tasks` (
   KEY `id_division` (`division_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
---
--- Dumping data for table `codifier_tasks`
---
+#
+# Structure for the `orders` table : 
+#
 
-LOCK TABLES `codifier_tasks` WRITE;
-/*!40000 ALTER TABLE `codifier_tasks` DISABLE KEYS */;
-INSERT INTO `codifier_tasks` VALUES (1,'РўРµС…РЅРѕР»РѕРіРёС‡РµСЃРєР°СЏ РїСЂРѕСЂР°Р±РѕС‚РєР°',2),(2,'Р—Р°РєР°Р· РјР°С‚РµСЂРёР°Р»РѕРІ',1),(3,'РР·РіРѕС‚РѕРІР»РµРЅРёРµ',3),(4,'РџСЂРѕРіСЂР°РјРјС‹ Р§РџРЈ',2);
-/*!40000 ALTER TABLE `codifier_tasks` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `number` int(11) DEFAULT NULL,
+  `status` char(10) DEFAULT NULL,
+  `detalavto` varchar(30) DEFAULT NULL,
+  `nazvdet` varchar(50) DEFAULT NULL,
+  `nosnas` varchar(30) DEFAULT NULL,
+  `nizv` varchar(15) DEFAULT NULL,
+  `kodinstr` varchar(30) DEFAULT NULL,
+  `nizvins` varchar(15) DEFAULT NULL,
+  `osin` char(1) DEFAULT NULL,
+  `date_start` datetime DEFAULT NULL,
+  `date_end` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `number` (`number`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `products`
---
+#
+# Structure for the `products` table : 
+#
 
-DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parrent_id` int(11) NOT NULL DEFAULT '0',
@@ -74,42 +83,20 @@ CREATE TABLE `products` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
---
--- Dumping data for table `products`
---
+#
+# Structure for the `products_types` table : 
+#
 
-LOCK TABLES `products` WRITE;
-/*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,0,1,'РњР°С‚СЂРёС†Р°','890-7680-1234-001'),(2,1,2,'Р­Р»РµРєС‚СЂРѕРґ','856-1234-5678'),(3,0,1,'РџСѓР°РЅСЃРѕРЅ','890-7680-1234-002'),(4,1,2,'РЁР°Р±Р»РѕРЅ','856-1235-5678');
-/*!40000 ALTER TABLE `products` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `products_types`
---
-
-DROP TABLE IF EXISTS `products_types`;
 CREATE TABLE `products_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
---
--- Dumping data for table `products_types`
---
+#
+# Structure for the `tasks` table : 
+#
 
-LOCK TABLES `products_types` WRITE;
-/*!40000 ALTER TABLE `products_types` DISABLE KEYS */;
-INSERT INTO `products_types` VALUES (1,'РћСЃРЅР°СЃС‚РєР°'),(2,'Р2Рџ');
-/*!40000 ALTER TABLE `products_types` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `tasks`
---
-
-DROP TABLE IF EXISTS `tasks`;
 CREATE TABLE `tasks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `codifier_id` int(11) DEFAULT NULL,
@@ -120,23 +107,151 @@ CREATE TABLE `tasks` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='InnoDB free: 11264 kB';
 
---
--- Dumping data for table `tasks`
---
+#
+# Structure for the `users` table : 
+#
 
-LOCK TABLES `tasks` WRITE;
-/*!40000 ALTER TABLE `tasks` DISABLE KEYS */;
-INSERT INTO `tasks` VALUES (1,1,'2011-12-21 00:00:00',NULL,1,1),(2,2,NULL,NULL,2,1),(3,3,NULL,NULL,3,1),(4,1,NULL,NULL,1,2),(5,4,NULL,NULL,2,2),(6,3,NULL,NULL,3,2),(7,2,NULL,NULL,4,2);
-/*!40000 ALTER TABLE `tasks` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group` varchar(10) NOT NULL,
+  `login` varchar(50) NOT NULL,
+  `pass` varchar(50) NOT NULL,
+  `rang` varchar(50) DEFAULT NULL,
+  `f` varchar(25) DEFAULT NULL,
+  `i` varchar(25) DEFAULT NULL,
+  `o` varchar(25) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+#
+# Definition for the `prod_view` view : 
+#
 
--- Dump completed on 2012-01-17  9:24:41
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `prod_view` AS 
+  select 
+    `products`.`id` AS `id`,
+    `products`.`name` AS `name`,
+    `products`.`code` AS `code`,
+    `products_types`.`name` AS `type` 
+  from 
+    (`products` left join `products_types` on((`products`.`type_id` = `products_types`.`id`)));
+
+#
+# Definition for the `tasksview` view : 
+#
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `tasksview` AS 
+  select 
+    `tasks`.`id` AS `task_id`,
+    `tasks`.`start` AS `start`,
+    `tasks`.`end` AS `end`,
+    `tasks`.`number` AS `number`,
+    `codifier_tasks`.`name` AS `taskname`,
+    `products`.`name` AS `name`,
+    `products`.`id` AS `productid`,
+    `products`.`code` AS `code` 
+  from 
+    ((`tasks` left join `codifier_tasks` on((`tasks`.`codifier_id` = `codifier_tasks`.`id`))) left join `products` on((`tasks`.`product_id` = `products`.`id`)));
+
+#
+# Data for the `codifier_divisions` table  (LIMIT 0,500)
+#
+
+INSERT INTO `codifier_divisions` (`id`, `name`) VALUES 
+  (1,'ПДО'),
+  (2,'ТОМО'),
+  (3,'12/1'),
+  (4,'12/2'),
+  (5,'12/3'),
+  (6,'12/7');
+
+COMMIT;
+
+#
+# Data for the `codifier_instr` table  (LIMIT 0,500)
+#
+
+INSERT INTO `codifier_instr` (`id`, `name`, `numstart`, `numend`, `sokr`) VALUES 
+  (1,'ММ',0,0,'ММ'),
+  (2,'Электрод',7680,7857,'Э'),
+  (3,'Шаблон',8370,9999,'Ш'),
+  (4,'Калибр',8130,8369,'Ка'),
+  (5,'Резец',2199,2298,'Р'),
+  (6,'Фреза',2299,2299,'Ф'),
+  (7,'Копир-модель',7054,7098,'КпМ'),
+  (8,'Приспособление',7099,7308,'П'),
+  (9,'Зенкер',2339,2398,'З'),
+  (10,'Развёртка',2399,2798,'Рз'),
+  (11,'Оправка',6299,7053,'О'),
+  (12,'Ролик',7990,8129,'Рол'),
+  (13,'Сверло',2300,2338,'С'),
+  (14,'Кондуктор',7309,7679,'К'),
+  (15,'Притир',2799,6298,'Пт'),
+  (16,'Давильник',1479,1498,'Д'),
+  (17,'Прессформа',1499,1548,'Пф'),
+  (18,'ЭХО',793,798,'ЭХО'),
+  (19,'Просечка',1549,2198,'Пр'),
+  (20,'Тара',1039,1478,'Т'),
+  (21,'Клеймо',7858,7989,'Кл'),
+  (22,'Разное (терм)',799,1038,'Ра');
+
+COMMIT;
+
+#
+# Data for the `codifier_tasks` table  (LIMIT 0,500)
+#
+
+INSERT INTO `codifier_tasks` (`id`, `name`, `division_id`) VALUES 
+  (1,'Технологическая проработка',2),
+  (2,'Заказ материалов',1),
+  (3,'Изготовление',3),
+  (4,'Программы ЧПУ',2);
+
+COMMIT;
+
+#
+# Data for the `orders` table  (LIMIT 0,500)
+#
+
+INSERT INTO `orders` (`id`, `number`, `status`, `detalavto`, `nazvdet`, `nosnas`, `nizv`, `kodinstr`, `nizvins`, `osin`, `date_start`, `date_end`) VALUES 
+  (1,NULL,NULL,'11111111111','111111111',NULL,'111',NULL,NULL,NULL,NULL,NULL);
+
+COMMIT;
+
+#
+# Data for the `products` table  (LIMIT 0,500)
+#
+
+INSERT INTO `products` (`id`, `parrent_id`, `type_id`, `name`, `code`) VALUES 
+  (1,0,1,'Матрица','890-7680-1234-001'),
+  (2,1,2,'Электрод','856-1234-5678'),
+  (3,0,1,'Пуансон','890-7680-1234-003'),
+  (4,1,2,'Шаблон','856-1235-5678');
+
+COMMIT;
+
+#
+# Data for the `products_types` table  (LIMIT 0,500)
+#
+
+INSERT INTO `products_types` (`id`, `name`) VALUES 
+  (1,'Оснастка'),
+  (2,'И2П');
+
+COMMIT;
+
+#
+# Data for the `tasks` table  (LIMIT 0,500)
+#
+
+INSERT INTO `tasks` (`id`, `codifier_id`, `start`, `end`, `number`, `product_id`) VALUES 
+  (1,1,'2011-12-21 00:00:00',NULL,1,1),
+  (2,2,NULL,NULL,2,1),
+  (3,3,NULL,NULL,3,1),
+  (4,1,NULL,NULL,1,2),
+  (5,4,NULL,NULL,2,2),
+  (6,3,NULL,NULL,3,2),
+  (7,2,NULL,NULL,4,2);
+
+COMMIT;
+
