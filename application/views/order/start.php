@@ -1,9 +1,18 @@
 <script type="text/javascript">
 $(document).ready(function(){
-	if($("#instrument :selected").val()=='O'); $("#instrument").hide();
+	if($("#instrument :selected").val()=='0'); $("#instrument").hide();
 	$("#osin").change(
 		function(){
-			if(this.value != '0') $("#instrument").show();
+			if(this.value != '0'){
+				$.ajax({
+					url: "../ajax/nextnumber/"+this.value,
+					success: function(data){
+						alert( "Прибыли данные: " + data );
+						$("#kodinstr").val(data);
+					}
+				});
+				$("#instrument").show();
+			}
 			else $("#instrument").hide();
 		}
 	)
@@ -38,6 +47,12 @@ jQuery("#grid").jqGrid({
 echo $title;
 echo form::open();
 ?>
+<?php
+foreach ($codifier_instr as $item){
+	$opt[$item['id']]= $item['name'].'    ('.$item['numstart'].')';
+}
+echo form::select('osin', $opt, '', array('id'=>'osin'));
+?>
 <table>
 	<?php
 	/*
@@ -63,12 +78,5 @@ echo form::open();
 	?>		
 	</table>
 </div>
-<?php
-foreach ($codifier_instr as $item){
-	$opt[$item['numstart']]= $item['name'].'    ('.$item['numstart'].')';
-}
-echo form::select('osin', $opt, '', array('id'=>'osin'));
-?>
-
 <table id="grid"></table>
 <div id="pager"></div>
