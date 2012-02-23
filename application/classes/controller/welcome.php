@@ -3,7 +3,7 @@
 class Controller_Welcome extends Controller_Template {
 
 	public $template = 'tpl/default';
-	
+
 	public function action_index()
 	{
 		//$query = 'SHOW TABLES';

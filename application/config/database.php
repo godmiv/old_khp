@@ -20,8 +20,8 @@ return array
 			 */
 			'hostname'   => 'localhost',
 			'database'   => 'khp',
-			'username'   => FALSE,
-			'password'   => FALSE,
+			'username'   => 'root',
+			'password'   => '1',
 			'persistent' => FALSE,
 		),
 		'table_prefix' => '',

@@ -9,19 +9,19 @@
 </pre>
 
 <script type="text/javascript">
-$(function(){ 
+$(function(){
   $("#list").jqGrid({
     url:'jgrid/test',
     datatype: 'xml',
     mtype: 'POST',
     colNames:['Actions','id',/*'parrent_id','type_id',*/'name','code','type'],
-    colModel:[ 
+    colModel:[
 		{name:'act',index:'act', width:75,sortable:false},
-		{name:'id', index:'id', width:10}, 
+		{name:'id', index:'id', width:10},
 		//{name:'parrent_id', index:'parrent_id', width:10},
-		//{name:'type_id', index:'type_id', width:10, align:'right',editable:true}, 
-		{name:'name', index:'name', width:80, align:'right',editable:true}, 
-		{name:'code', index:'code', width:180, align:'right',editable:true},//classes: 'cvteste'}, 
+		//{name:'type_id', index:'type_id', width:10, align:'right',editable:true},
+		{name:'name', index:'name', width:80, align:'right',editable:true},
+		{name:'code', index:'code', width:180, align:'right',editable:true},//classes: 'cvteste'},
 		{name:'type', index:'type', width:80,align:'right',editable:true}
     ],
     pager: '#pager',
@@ -70,9 +70,9 @@ $(function(){
 			colModel: [
 				{name:'act',index:'act', width:75,sortable:false},
 				{name:'id', index:'id', width:10},
-				//{name:'parrent_id', index:'parrent_id', width:10}, 
-				//{name:'type_id', index:'type_id', width:10, align:'right'}, 
-				{name:'name', index:'name', width:80, align:'right',editable:true}, 
+				//{name:'parrent_id', index:'parrent_id', width:10},
+				//{name:'type_id', index:'type_id', width:10, align:'right'},
+				{name:'name', index:'name', width:80, align:'right',editable:true},
 				{name:'code', index:'code', width:180, align:'right',editable:true},
 				{name:'type', index:'type', width:80,align:'right',editable:true}
 			],
@@ -92,7 +92,7 @@ $(function(){
 					se = "<input style='height:22px;width:20px;' type='button' value='S' onclick=\"jQuery('#"+subgrid_table_id+"').saveRow('"+cl+"');\"  />";
 					ce = "<input style='height:22px;width:20px;' type='button' value='C' onclick=\"jQuery('#"+subgrid_table_id+"').restoreRow('"+cl+"');\" />";
 					jQuery("#"+subgrid_table_id).jqGrid('setRowData',ids[i],{act:be+se+ce});
-					
+
 					//тест раскраски строки в зависимости от значения какойнибудь ячейки
 					var status = jQuery("#"+subgrid_table_id).getRowData(ids[i]).name;
 					if(status == "Электрод"){
@@ -104,14 +104,14 @@ $(function(){
 			}
        });
 	}
-  }); 
+  });
 });
 
 </script>
- 
+
 </head>
 <body>
-<table id="list"><tr><td/></tr></table> 
+<table id="list"><tr><td/></tr></table>
 <div id="pager"></div>
 
 <table id="list4"></table>
@@ -127,13 +127,13 @@ jQuery("#list4").jqGrid({
    		{name:'invdate',index:'invdate', width:90, sorttype:"date",editable:true},
    		{name:'name',index:'name', width:100,editable:true},
    		{name:'amount',index:'amount', width:80, align:"right",sorttype:"float",editable:true},
-   		{name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},		
-   		{name:'total',index:'total', width:80,align:"right",sorttype:"float"},		
+   		{name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},
+   		{name:'total',index:'total', width:80,align:"right",sorttype:"float"},
    		{name:'note',index:'note', width:150, sortable:false}
    	],
 	subGrid : true, //Если здесь поставить false - то всё работает правильно
     subGridModel: [{ name  : ['No','Item','Qty','Unit','Line Total'],
-                    width : [55,200,80,80,80] } 
+                    width : [55,200,80,80,80] }
     ],
 	onSelectRow: function(id){
 		if(id && id!==lastsel){
