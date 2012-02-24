@@ -16,24 +16,10 @@ class Controller_Order extends Controller_Template {
 			);
 
 		$data['form_ins'] = array(
-			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>'','attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr')),
+			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>'','attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr', 'readonly'=>'readonly')),
 			'nizvins'	=>array('name'=>'nizvins',	'value'=>'','attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
 			);
 
-		$data['form_all'] = array(
-			'osin'=>array(
-				'name'=>'osin',
-				'options'=>array(
-					//NULL=>'','O'=>'Оснастка','E'=>'Электрод','S'=>'Шаблон','K'=>'Копир'
-					'O'=>'Оснастка','E'=>'Электрод','S'=>'Шаблон','K'=>'Копир'
-					),
-				'attr'=>array(
-					'desc'=>'Тип изделия',
-					'selected'=>'O',
-					'id'=>'osin',
-					)
-				)
-			);
 		$query = 'SELECT * FROM orders LIMIT 1';
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 		$data['columns'] = array_keys($result[0]);
@@ -42,5 +28,23 @@ class Controller_Order extends Controller_Template {
 		$data['codifier_instr'] = $result = DB::query(Database::SELECT,$query)->execute()->as_array();
 	
 		$this->template->content = View::factory('order/start',$data);
+	}
+
+	public function action_add() {
+		if(isset($_POST['add'])){
+			if(TRUE){
+				$query = DB::insert('orders', array('detalavto','nazvdet','nosnas','nizv','kodinstr','nizvins'))
+						->values(array(
+							Arr::get($_POST, 'detalavto'),
+							Arr::get($_POST, 'nazvdet'),
+							Arr::get($_POST, 'nosnas'),
+							Arr::get($_POST, 'nizv'),
+							Arr::get($_POST, 'kodinstr'),
+							Arr::get($_POST, 'nizvins')
+							));
+
+			}
+			else $this->template->content = 'Ошибка добавления записи в базу.';
+		}
 	}
 }
