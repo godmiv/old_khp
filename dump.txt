@@ -1,0 +1,5 @@
+Создание дампа базы:
+mysqldump.exe pdo_mo > d:/usr/www/_CI_pdo_mo/dump_pdo_mo.sql
+
+Восстановление базы из дампа:
+mysql pdo_mo < d:/usr/www/_CI_pdo_mo/dump_pdo_mo.sql
