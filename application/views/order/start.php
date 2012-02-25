@@ -7,7 +7,7 @@ $(document).ready(function(){
 				$.ajax({
 					url: "../ajax/nextnumber/"+this.value,
 					success: function(data){
-						alert( "Прибыли данные: " + data );
+						alert( "+1: " + data );
 						$("#kodinstr").val(data);
 					}
 				});
@@ -45,7 +45,7 @@ jQuery("#grid").jqGrid({
 
 <?php
 echo $title;
-echo form::open();
+echo form::open('/order/add');
 ?>
 <?php
 foreach ($codifier_instr as $item){
@@ -70,13 +70,19 @@ echo form::select('osin', $opt, '', array('id'=>'osin'));
 	?>
 </table>
 <div id="instrument">
-	<table>
+<table>
 	<?php
 	foreach ($form_ins as $field){
 		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::input($field['name'], $field['value'], $field['attr']).'</td></tr>';
 	}
 	?>		
-	</table>
+</table>
 </div>
+<table>
+	<?php
+	echo '<tr><td>'.form::submit('add','Добавить деталь').'</td></tr>';
+	echo form::close();
+	?>
+</table>
 <table id="grid"></table>
 <div id="pager"></div>
