@@ -42,7 +42,9 @@ class Controller_Order extends Controller_Template {
 							Arr::get($_POST, 'kodinstr'),
 							Arr::get($_POST, 'nizvins')
 							));
-
+				$query->execute();
+				Request::current()->redirect('order/start');
+				
 			}
 			else $this->template->content = 'Ошибка добавления записи в базу.';
 		}

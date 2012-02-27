@@ -22,7 +22,8 @@ class Controller_ajax extends Controller {
 		$int++;
 		//(string)$int;
 		
-		$res = substr($int,0,3).'-'.substr($int,3,4).'-'.substr($int,7,4);
-		$this->response->body($res);
+		$res = substr($int,0,3).'-'.substr($int,3,4).'-'.substr($int,7,4).'|'.$r[0]['name'];
+		//$this->response->body($res);
+		echo $res;
 	}
 }
