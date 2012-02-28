@@ -23,10 +23,10 @@ class Controller_Order extends Controller_Template {
 		$query = 'SELECT * FROM orders LIMIT 1';
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 		$data['columns'] = array_keys($result[0]);
-		
+
 		$query = 'SELECT * FROM codifier_instr';
 		$data['codifier_instr'] = $result = DB::query(Database::SELECT,$query)->execute()->as_array();
-	
+
 		$this->template->content = View::factory('order/start',$data);
 	}
 
@@ -44,7 +44,7 @@ class Controller_Order extends Controller_Template {
 							));
 				$query->execute();
 				Request::current()->redirect('order/start');
-				
+
 			}
 			else $this->template->content = 'Ошибка добавления записи в базу.';
 		}

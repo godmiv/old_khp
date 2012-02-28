@@ -19,19 +19,27 @@ $(document).ready(function(){
 			else $("#instrument").hide();
 		}
 	)
-	
+
 });
 </script>
 <script type="text/javascript">
-$(function(){ 
-jQuery("#grid").jqGrid({        
+$(function(){
+jQuery("#grid").jqGrid({
     url:'../jgrid/order',
     datatype: 'xml',
     mtype: 'POST',
    	colNames:["<?php echo implode('","',$columns);?>"],
    	colModel:[
 		<?php foreach($columns as $col):?>
-		{name:'<?=$col;?>',index:'<?=$col;?>',width:75,editable:true},
+		{name:'<?=$col;?>',
+			index:'<?=$col;?>',
+			width:75,
+			editable:<?php
+			if($col != 'id') echo 'true';
+			else echo 'false'
+			?>},
+
+
 		<?php endforeach;?>
    	],
    	rowNum:10,
@@ -85,7 +93,7 @@ echo form::select('osin', $opt, '', array('id'=>'osin'));
 	foreach ($form_ins as $field){
 		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::input($field['name'], $field['value'], $field['attr']).'</td></tr>';
 	}
-	?>		
+	?>
 </table>
 </div>
 <table>
