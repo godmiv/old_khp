@@ -1,14 +1,17 @@
 <script type="text/javascript">
 $(document).ready(function(){
-	if($("#instrument :selected").val()=='0'); $("#instrument").hide();
+	if($("#instrument :selected").val()=='1'); $("#instrument").hide();
 	$("#osin").change(
 		function(){
-			if(this.value != '0'){
+			if(this.value != '1'){
 				$.ajax({
 					url: "../ajax/nextnumber/"+this.value,
 					success: function(data){
-						alert( "+1: " + data );
-						$("#kodinstr").val(data);
+						//alert( "data: " + data );
+						var temp = new Array();
+						temp = data.split('|');
+						$("#kodinstr").val(temp[0]);
+						$("#nazvdet").val(temp[1]);
 					}
 				});
 				$("#instrument").show();
@@ -28,7 +31,7 @@ jQuery("#grid").jqGrid({
    	colNames:["<?php echo implode('","',$columns);?>"],
    	colModel:[
 		<?php foreach($columns as $col):?>
-		{name:'<?=$col;?>',index:'<?=$col;?>',width:75},
+		{name:'<?=$col;?>',index:'<?=$col;?>',width:75,editable:true},
 		<?php endforeach;?>
    	],
    	rowNum:10,
@@ -40,6 +43,13 @@ jQuery("#grid").jqGrid({
     caption:"Simple data manipulation",
 	autowidth: true
 }).navGrid("#pager",{edit:true,add:true,del:true});
+});
+
+$("#grid").click(function(){
+	var gr = jQuery("#grid").jqGrid('getGridParam','selrow');
+	alert (gr);
+	//if( gr != null ) jQuery("#grid").jqGrid('editGridRow',gr,{height:280,reloadAfterSubmit:false});
+	//else alert("Please Select Row");
 });
 </script>
 
