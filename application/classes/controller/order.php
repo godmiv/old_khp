@@ -4,7 +4,7 @@ class Controller_Order extends Controller_Template {
 
 	public $template = 'tpl/default';
 
-	public function action_start() {
+	public function action_start(){
 
 		$data['title'] = 'Открытие заказа';
 
@@ -30,8 +30,9 @@ class Controller_Order extends Controller_Template {
 		$this->template->content = View::factory('order/start',$data);
 	}
 
-	public function action_add() {
+	public function action_add(){
 		if(isset($_POST['add'])){
+//валидация!!!
 			if(TRUE){
 				$query = DB::insert('orders', array('detalavto','nazvdet','nosnas','nizv','kodinstr','nizvins'))
 						->values(array(
@@ -48,5 +49,8 @@ class Controller_Order extends Controller_Template {
 			}
 			else $this->template->content = 'Ошибка добавления записи в базу.';
 		}
+	}
+	public function action_del(){
+		
 	}
 }
