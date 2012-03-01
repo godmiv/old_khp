@@ -1,6 +1,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
-	if($("#instrument :selected").val()=='1'); $("#instrument").hide();
+	//if($("#instrument :selected").val()=='1');
+	$("#instrument").hide();
 	$("#osin").change(
 		function(){
 			if(this.value != '1'){
@@ -15,11 +16,13 @@ $(document).ready(function(){
 					}
 				});
 				$("#instrument").show();
+			} else {
+				$("#instrument").hide();
+				$("#nazvdet").val('');
 			}
-			else $("#instrument").hide();
 		}
 	)
-
+	$("#box").resizable();
 });
 </script>
 <script type="text/javascript">
@@ -38,8 +41,6 @@ jQuery("#grid").jqGrid({
 			if($col != 'id') echo 'true';
 			else echo 'false'
 			?>},
-
-
 		<?php endforeach;?>
    	],
    	rowNum:10,
@@ -49,9 +50,12 @@ jQuery("#grid").jqGrid({
     viewrecords: true,
     sortorder: "desc",
     caption:"Simple data manipulation",
-	autowidth: true
+	autowidth: true,
+	height: "100%"
+	
 }).navGrid("#pager",{edit:true,add:true,del:true});
 });
+//jQuery("#grid").jqGrid('gridResize',{minWidth:350,maxWidth:800,minHeight:80, maxHeight:350});
 
 $("#grid").click(function(){
 	var gr = jQuery("#grid").jqGrid('getGridParam','selrow');

@@ -97,10 +97,14 @@ class Controller_jgrid extends Controller {
 	{
 		
 	}
-	public function action_del()
+	
+	public function action_delOrder()
 	{
-		
+		$id = arr::extract($_POST['id'], 'id');
+		$query = DB::delete('orders')->where('id', $id);
+		$query->execute();
 	}
+	
 	public function action_order()
 	{
 		$this->auto_render = false;

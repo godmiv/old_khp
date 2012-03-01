@@ -33,7 +33,13 @@ class Controller_Order extends Controller_Template {
 	public function action_add(){
 		if(isset($_POST['add'])){
 //валидация!!!
-			if(TRUE){
+			$post = Validation::factory($_POST);
+			if($_POST['osin'] == 1){
+				$post->rule('nosnas', 'not_empty');
+			} else {
+				$post->rule('kodinstr', 'not_empty');
+			}
+			if($post->check()){
 				$query = DB::insert('orders', array('detalavto','nazvdet','nosnas','nizv','kodinstr','nizvins'))
 						->values(array(
 							Arr::get($_POST, 'detalavto'),
@@ -45,7 +51,6 @@ class Controller_Order extends Controller_Template {
 							));
 				$query->execute();
 				Request::current()->redirect('order/start');
-
 			}
 			else $this->template->content = 'Ошибка добавления записи в базу.';
 		}
