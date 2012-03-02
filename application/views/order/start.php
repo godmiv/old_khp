@@ -22,13 +22,12 @@ $(document).ready(function(){
 			}
 		}
 	)
-	$("#box").resizable();
+	//$("#box").resizable();
 });
-</script>
-<script type="text/javascript">
+
 $(function(){
 jQuery("#grid").jqGrid({
-    url:'../jgrid/order',
+    url:'../order/jqgrid',
     datatype: 'xml',
     mtype: 'POST',
    	colNames:["<?php echo implode('","',$columns);?>"],
@@ -49,12 +48,23 @@ jQuery("#grid").jqGrid({
    	sortname: 'id',
     viewrecords: true,
     sortorder: "desc",
-    caption:"Simple data manipulation",
+    caption: "Simple data manipulation",
 	autowidth: true,
-	height: "100%"
+	height: "100%",
+	editurl: "../order/edit"
 	
-}).navGrid("#pager",{edit:true,add:true,del:true});
+})//.navGrid("#pager",{edit:true,add:true,del:true});
+
+jQuery("#grid").jqGrid('navGrid','#pager',
+{edit:true,add:false,del:true}, //options
+{}, // edit options
+{}, // add options
+{}, // del options
+{} // search options
+);
 });
+
+
 //jQuery("#grid").jqGrid('gridResize',{minWidth:350,maxWidth:800,minHeight:80, maxHeight:350});
 
 $("#grid").click(function(){
