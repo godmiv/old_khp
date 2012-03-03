@@ -7,8 +7,9 @@ $(document).ready(function(){
 			if(this.value != '1'){
 				$.ajax({
 					url: "../ajax/nextnumber/"+this.value,
+					cache: false,
 					success: function(data){
-						//alert( "data: " + data );
+						alert( "data: " + data );
 						var temp = new Array();
 						temp = data.split('|');
 						$("#kodinstr").val(temp[0]);
@@ -52,11 +53,11 @@ jQuery("#grid").jqGrid({
 	autowidth: true,
 	height: "100%",
 	editurl: "../order/edit"
-	
+
 })//.navGrid("#pager",{edit:true,add:true,del:true});
 
 jQuery("#grid").jqGrid('navGrid','#pager',
-{edit:true,add:false,del:true}, //options
+{edit:true,add:true,del:true}, //options
 {}, // edit options
 {}, // add options
 {}, // del options

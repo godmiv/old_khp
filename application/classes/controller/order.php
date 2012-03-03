@@ -32,7 +32,6 @@ class Controller_Order extends Controller_Template {
 
 	public function action_add(){
 		if(isset($_POST['add'])){
-//валидация!!!
 			$post = Validation::factory($_POST);
 			if($_POST['osin'] == 1){
 				$post->rule('nosnas', 'not_empty');
@@ -55,7 +54,11 @@ class Controller_Order extends Controller_Template {
 			else $this->template->content = 'Ошибка добавления записи в базу.';
 		}
 	}
-	
+
+	/*
+	 * Этот метод вызывается стандартными кнопками jqgrid
+	 * При нажатии кнопки jqgrid посылает $_POST['oper'] который может содержать del, edit или add
+	 */
 	public function action_edit(){
 	$this->auto_render = false;
 		if($_POST['oper'] == 'del'){
@@ -63,7 +66,7 @@ class Controller_Order extends Controller_Template {
 			$query->execute();
 		}
 		if($_POST['oper'] == 'edit'){
-			
+
 		}
 		$this->response->body($_POST['oper']);
 	}
@@ -76,28 +79,28 @@ class Controller_Order extends Controller_Template {
 		$sidx = $_POST['sidx'];
 		$sord = $_POST['sord'];
 		if(!$sidx) $sidx =1;
- 
-		// calculate the number of rows for the query. We need this for paging the result 
+
+		// calculate the number of rows for the query. We need this for paging the result
 		$query = 'SELECT * FROM orders';
 		$count = DB::query(Database::SELECT,$query)->execute()->count();
 
-		// calculate the total pages for the query 
-		if( $count > 0 && $limit > 0) { 
-			$total_pages = ceil($count/$limit); 
-		} else { 
-			$total_pages = 0; 
-		} 
+		// calculate the total pages for the query
+		if( $count > 0 && $limit > 0) {
+			$total_pages = ceil($count/$limit);
+		} else {
+			$total_pages = 0;
+		}
 
-		// if for some reasons the requested page is greater than the total 
-		// set the requested page to total page 
+		// if for some reasons the requested page is greater than the total
+		// set the requested page to total page
 		if ($page > $total_pages) $page=$total_pages;
 
-		// calculate the starting position of the rows 
+		// calculate the starting position of the rows
 		$start = $limit*$page - $limit;
 
-		// if for some reasons start position is negative set it to 0 
-		// typical case is that the user type 0 for the requested page 
-		if($start <0) $start = 0; 
+		// if for some reasons start position is negative set it to 0
+		// typical case is that the user type 0 for the requested page
+		if($start <0) $start = 0;
 		$query = 'SELECT * FROM orders ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
@@ -109,7 +112,7 @@ class Controller_Order extends Controller_Template {
 		$s .= "<page>".$page."</page>";
 		$s .= "<total>".$total_pages."</total>";
 		$s .= "<records>".$count."</records>";
- 
+
 		$fields = array_keys($result[0]);
 		//print_r($fields);
 		// be sure to put text data in CDATA
