@@ -9,7 +9,7 @@ $(document).ready(function(){
 					url: "../ajax/nextnumber/"+this.value,
 					cache: false,
 					success: function(data){
-						alert( "data: " + data );
+						//alert( "data: " + data );
 						var temp = new Array();
 						temp = data.split('|');
 						$("#kodinstr").val(temp[0]);
@@ -76,9 +76,16 @@ $("#grid").click(function(){
 });
 </script>
 
+<?php if (isset($errors)): ?>
+<p>Some errors were encountered, please check the details you entered.</p>
+<?php foreach ($errors as $message): ?>
+    <?php echo $message ?><br />
+<?php endforeach ?>
+<?php endif ?>
+
 <?php
-echo $title;
-echo form::open('/order/add');
+//echo form::open('/order/add');
+echo form::open();
 ?>
 <?php
 foreach ($codifier_instr as $item){
