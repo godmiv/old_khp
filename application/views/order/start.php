@@ -53,7 +53,8 @@ jQuery("#grid").jqGrid({
     caption: "Simple data manipulation",
 	autowidth: true,
 	height: "100%",
-	editurl: "../order/edit"
+	editurl: "../order/edit",
+	multiselect: true
 
 })//.navGrid("#pager",{edit:true,add:true,del:true});
 

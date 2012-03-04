@@ -64,7 +64,8 @@ class Controller_Order extends Controller_Template {
 	public function action_edit(){
 	$this->auto_render = false;
 		if($_POST['oper'] == 'del'){
-			$query = DB::delete('orders')->where('id', '=', $_POST['id']);
+			$ids = explode(',',$_POST['id']);
+			$query = DB::delete('orders')->where('id', 'IN', $ids);
 			$query->execute();
 		}
 		if($_POST['oper'] == 'edit'){
