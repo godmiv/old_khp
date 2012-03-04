@@ -24,6 +24,7 @@ $(document).ready(function(){
 		}
 	)
 	//$("#box").resizable();
+	opendialog();
 });
 
 $(function(){
@@ -80,15 +81,15 @@ $("#dialog").dialog({
 	width:550,				//ширина
 	height: 500,			//высота
 	modal: false           	//true -  окно модальное, false - нет
-/*	buttons: {
+	/*buttons: {
 		"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
 		"Закрыть": function() { $(this).dialog("close"); }
-	}
-*/
+	}*/
 });
 }
+
 </script>
-<!--input type="button" onclick="opendialog();" value="проба" /-->
+<input type="button" onclick="opendialog();" value="Добавить деталь" />
 <div id="dialog">
 <?php if (isset($errors)): ?>
 <p>Some errors were encountered, please check the details you entered.</p>
