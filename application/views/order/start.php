@@ -7,6 +7,7 @@ $(document).ready(function(){
 			if(this.value != '1'){
 				$.ajax({
 					url: "../ajax/nextnumber/"+this.value,
+					cache: false,
 					success: function(data){
 						//alert( "data: " + data );
 						var temp = new Array();
@@ -23,6 +24,7 @@ $(document).ready(function(){
 		}
 	)
 	//$("#box").resizable();
+	opendialog();
 });
 
 $(function(){
@@ -52,11 +54,10 @@ jQuery("#grid").jqGrid({
 	autowidth: true,
 	height: "100%",
 	editurl: "../order/edit"
-	
 })//.navGrid("#pager",{edit:true,add:true,del:true});
 
 jQuery("#grid").jqGrid('navGrid','#pager',
-{edit:true,add:false,del:true}, //options
+{edit:true,add:true,del:true}, //options
 {}, // edit options
 {}, // add options
 {}, // del options
@@ -73,11 +74,31 @@ $("#grid").click(function(){
 	//if( gr != null ) jQuery("#grid").jqGrid('editGridRow',gr,{height:280,reloadAfterSubmit:false});
 	//else alert("Please Select Row");
 });
-</script>
+function opendialog(){
+$("#dialog").dialog({
+	title: "Добавление детали",  	//тайтл, заголовок окна
+	width:550,				//ширина
+	height: 500,			//высота
+	modal: false           	//true -  окно модальное, false - нет
+	/*buttons: {
+		"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
+		"Закрыть": function() { $(this).dialog("close"); }
+	}*/
+});
+}
 
+</script>
+<input type="button" onclick="opendialog();" value="Добавить деталь" />
+<div id="dialog">
+<?php if (isset($errors)): ?>
+<p>Some errors were encountered, please check the details you entered.</p>
+<?php foreach ($errors as $message): ?>
+    <?php echo $message ?><br />
+<?php endforeach ?>
+<?php endif ?>
 <?php
-echo $title;
-echo form::open('/order/add');
+//echo form::open('/order/add');
+echo form::open();
 ?>
 <?php
 foreach ($codifier_instr as $item){
@@ -116,5 +137,6 @@ echo form::select('osin', $opt, '', array('id'=>'osin'));
 	echo form::close();
 	?>
 </table>
+</div>
 <table id="grid"></table>
 <div id="pager"></div>
