@@ -61,13 +61,32 @@ class Controller_Order extends Controller_Template {
 	 * При нажатии кнопки jqgrid посылает $_POST['oper'] который может содержать del, edit или add
 	 */
 	public function action_edit(){
-	$this->auto_render = false;
+		$this->auto_render = false;
+		
 		if($_POST['oper'] == 'del'){
-			$ids = explode(',',$_POST['id']);
-			$query = DB::delete('orders')->where('id', 'IN', $ids);
+			$query = DB::delete('orders')->where('id', '=', $_POST['id']);
 			$query->execute();
 		}
+		
 		if($_POST['oper'] == 'edit'){
+//			print_r($_POST);
+
+			$id = Arr::get($_POST,'id');
+			$query = DB::select()->from('orders')->where('id', '=', $id);
+			$f = $query->execute()->as_array();
+			
+			$f = $f[0];
+			$query="SELECT * FROM orders WHERE ((nosnas='".$f['nosnas']."' AND kodinstr ='') OR (kodinstr = '".$f['kodinstr']."'))";
+			$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+			print_r($query);
+			if(empty ($result)){
+				$query = DB::update('orders')
+						->set(array('kodinstr' => Arr::get($_POST,'kodinstr'),
+									'nosnas' => Arr::get($_POST,'nosnas'),
+							))
+						->where('id', '=', $id);
+				$query->execute();
+			}
 		}
 		$this->response->body($_POST['oper']);
 	}
