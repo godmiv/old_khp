@@ -8,6 +8,7 @@ Class Model_helper extends Model
 		$str = substr($int,0,3).'-'.substr($int,3,4).'-'.substr($int,7,4); //890-8372-0000
 		return $str.substr($string,13); //890-8372-0000x-001
 	}
+
 	public static function validateNosnas($value){
 		$query = 'SELECT nosnas FROM `orders` WHERE nosnas = "'.$value.'"';
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();

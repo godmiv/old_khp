@@ -62,19 +62,19 @@ class Controller_Order extends Controller_Template {
 	 */
 	public function action_edit(){
 		$this->auto_render = false;
-		
+
 		if($_POST['oper'] == 'del'){
 			$query = DB::delete('orders')->where('id', '=', $_POST['id']);
 			$query->execute();
 		}
-		
+
 		if($_POST['oper'] == 'edit'){
 //			print_r($_POST);
 
 			$id = Arr::get($_POST,'id');
 			$query = DB::select()->from('orders')->where('id', '=', $id);
 			$f = $query->execute()->as_array();
-			
+
 			$f = $f[0];
 			$query="SELECT * FROM orders WHERE ((nosnas='".$f['nosnas']."' AND kodinstr ='') OR (kodinstr = '".$f['kodinstr']."'))";
 			$result = DB::query(Database::SELECT,$query)->execute()->as_array();
@@ -91,8 +91,8 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($_POST['oper']);
 	}
 
-	public function action_jqgrid()
-	{
+	public function action_jqgrid(){
+
 		$this->auto_render = false;
 		$page = $_POST['page'];
 		$limit = $_POST['rows'];
@@ -100,7 +100,7 @@ class Controller_Order extends Controller_Template {
 		$sord = $_POST['sord'];
 		if(!$sidx) $sidx =1;
 		// calculate the number of rows for the query. We need this for paging the result
-		$query = 'SELECT * FROM orders';
+		$query = 'SELECT * FROM orders WHERE number IS NULL';
 		$count = DB::query(Database::SELECT,$query)->execute()->count();
 
 		// calculate the total pages for the query
@@ -120,7 +120,7 @@ class Controller_Order extends Controller_Template {
 		// if for some reasons start position is negative set it to 0
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
-		$query = 'SELECT * FROM orders ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
+		$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
 		// we should set the appropriate header information. Do not forget this.
@@ -148,4 +148,78 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
+
+	public function action_orders(){
+
+		$this->auto_render = false;
+		$page = $_POST['page'];
+		$limit = $_POST['rows'];
+		$sidx = $_POST['sidx'];
+		$sord = $_POST['sord'];
+		if(!$sidx) $sidx =1;
+		// calculate the number of rows for the query. We need this for paging the result
+		$query = 'SELECT * FROM orders WHERE number IS NOT NULL';
+		$count = DB::query(Database::SELECT,$query)->execute()->count();
+
+		// calculate the total pages for the query
+		if( $count > 0 && $limit > 0) {
+			$total_pages = ceil($count/$limit);
+		} else {
+			$total_pages = 0;
+		}
+
+		// if for some reasons the requested page is greater than the total
+		// set the requested page to total page
+		if ($page > $total_pages) $page=$total_pages;
+
+		// calculate the starting position of the rows
+		$start = $limit*$page - $limit;
+
+		// if for some reasons start position is negative set it to 0
+		// typical case is that the user type 0 for the requested page
+		if($start <0) $start = 0;
+		$query = 'SELECT * FROM orders WHERE number IS NOT NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
+		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+
+		$s = "<?xml version='1.0' encoding='utf-8'?>";
+		$s .= "<rows>";
+		$s .= "<page>".$page."</page>";
+		$s .= "<total>".$total_pages."</total>";
+		$s .= "<records>".$count."</records>";
+
+		$fields = array_keys($result[0]);
+		//print_r($fields);
+		// be sure to put text data in CDATA
+		foreach($result as $row){
+			$s .= "<row id='". $row['id']."'>";
+			//$s .= "<cell></cell>"; //это для пустой колонки Actions - если не передать пустое значение -в jqgrid колонки сдвигаются, получается каша
+
+			foreach($fields as $key=>$val) {
+				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
+			}
+
+			$s .= "</row>";
+		}
+		$s .= "</rows>";
+		$this->response->body($s);
+	}
+
+	public function action_setorders(){
+		$this->auto_render = false;
+		if(!empty($_POST)){
+			$ids = explode(',', $_POST['ids']);
+			$query = DB::select(array('max("number")', 'maxnum'))->from('orders');
+			$result = $query->execute()->as_array();
+			$nextnum = $result[0]['maxnum'] + 1;
+			$query = DB::update('orders')->set(array('number' => $nextnum))->where('id', 'IN', $ids);
+			$query->execute();
+			print_r($nextnum);
+		} else {
+			echo 'Не выбрана ни одна деталь';
+		}
+	}
+
 }

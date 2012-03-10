@@ -50,7 +50,7 @@ jQuery("#grid").jqGrid({
    	sortname: 'id',
     viewrecords: true,
     sortorder: "desc",
-    caption: "Simple data manipulation",
+    caption: "Детали которым не присвоен номер заказа",
 	autowidth: true,
 	height: "100%",
 	editurl: "../order/edit",
@@ -75,6 +75,46 @@ $("#grid").click(function(){
 	//if( gr != null ) jQuery("#grid").jqGrid('editGridRow',gr,{height:280,reloadAfterSubmit:false});
 	//else alert("Please Select Row");
 });
+
+$(function(){
+jQuery("#orders").jqGrid({
+    url:'../order/orders',
+    datatype: 'xml',
+    mtype: 'POST',
+   	colNames:["<?php echo implode('","',$columns);?>"],
+   	colModel:[
+		<?php foreach($columns as $col):?>
+		{name:'<?=$col;?>',
+			index:'<?=$col;?>',
+			width:75,
+			editable:<?php
+			if($col != 'id') echo 'true';
+			else echo 'false'
+			?>},
+		<?php endforeach;?>
+   	],
+   	rowNum:10,
+   	rowList:[10,20,30],
+   	pager: '#pagerorders',
+   	sortname: 'id',
+    viewrecords: true,
+    sortorder: "desc",
+    caption: "Заказы",
+	autowidth: true,
+	height: "100%",
+	//editurl: "../order/edit",
+	multiselect: true
+});
+
+jQuery("#orders").jqGrid('navGrid','#pagerorders',
+{edit:false,add:false,del:false}, //options
+{}, // edit options
+{}, // add options
+{}, // del options
+{} // search options
+);
+});
+
 function opendialog(){
 $("#dialog").dialog({
 	title: "Добавление детали",  	//тайтл, заголовок окна
@@ -87,12 +127,29 @@ $("#dialog").dialog({
 	}*/
 });
 }
+function addtoorder(){
+	s = jQuery("#grid").jqGrid('getGridParam','selarrrow');
+	if(s != ''){
+		$.ajax({
+			url: "/order/setorders/",
+			data: 'ids='+s,
+			type: 'POST',
+			cache: false,
+			success: function(data){
+				alert( "data: " + data );
+			}
+		});
+		$('#grid').trigger("reloadGrid");
+	}
+	//alert(s);
+}
 
 </script>
 <input type="button" onclick="opendialog();" value="Добавить деталь" />
+<input type="button" onclick="addtoorder();" value="Добавить детали в заказ" />
 <div id="dialog">
 <?php if (isset($errors)): ?>
-<p>Some errors were encountered, please check the details you entered.</p>
+<p>Ошибка при заполнении полей, проверьте все поля.</p>
 <?php foreach ($errors as $message): ?>
     <?php echo $message ?><br />
 <?php endforeach ?>
@@ -134,10 +191,15 @@ echo form::select('osin', $opt, '', array('id'=>'osin'));
 </div>
 <table>
 	<?php
-	echo '<tr><td>'.form::submit('add','Добавить деталь').'</td></tr>';
+	echo '<tr><td>'.form::submit('add','Добавить деталь').'</td><td>'.'</td></tr>';
 	echo form::close();
 	?>
 </table>
 </div>
+
 <table id="grid"></table>
 <div id="pager"></div>
+
+<div>Заказы</div>
+<table id="orders"></table>
+<div id="pagerorders"></div>
