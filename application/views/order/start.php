@@ -55,6 +55,7 @@ jQuery("#grid").jqGrid({
 	height: "100%",
 	editurl: "../order/edit",
 	multiselect: true
+
 });
 
 jQuery("#grid").jqGrid('navGrid','#pager',
@@ -96,7 +97,7 @@ jQuery("#orders").jqGrid({
    	rowNum:10,
    	rowList:[10,20,30],
    	pager: '#pagerorders',
-   	sortname: 'id',
+   	sortname: 'number',
     viewrecords: true,
     sortorder: "desc",
     caption: "Заказы",
@@ -128,18 +129,39 @@ $("#dialog").dialog({
 });
 }
 function addtoorder(){
+	var s=s1=z='';
 	s = jQuery("#grid").jqGrid('getGridParam','selarrrow');
+	s1= jQuery("#orders").jqGrid('getGridParam','selarrrow');
+	if(s1 != '') z = jQuery("#orders").jqGrid('getCell',s1,'number');
+//alert('ids='+s+'&order='+z);
 	if(s != ''){
 		$.ajax({
-			url: "/order/setorders/",
+			url: "/order/addtoorder/",
+			data: 'ids='+s+'&order='+z,
+			type: 'POST',
+			cache: false,
+			success: function(data){
+				$('#grid').trigger('reloadGrid');
+				$('#orders').trigger('reloadGrid');
+				//alert( "data: " + data );
+			}
+		});
+	}
+}
+function delfromorder(){
+	s = jQuery("#orders").jqGrid('getGridParam','selarrrow');
+	if(s != ''){
+		$.ajax({
+			url: "/order/delfromorder/",
 			data: 'ids='+s,
 			type: 'POST',
 			cache: false,
 			success: function(data){
-				alert( "data: " + data );
+				$('#grid').trigger("reloadGrid");
+				$('#orders').trigger("reloadGrid");
+				//alert( "data: " + data );
 			}
 		});
-		$('#grid').trigger("reloadGrid");
 	}
 	//alert(s);
 }
@@ -147,6 +169,7 @@ function addtoorder(){
 </script>
 <input type="button" onclick="opendialog();" value="Добавить деталь" />
 <input type="button" onclick="addtoorder();" value="Добавить детали в заказ" />
+<input type="button" onclick="delfromorder();" value="Удалить детали из заказа" />
 <div id="dialog">
 <?php if (isset($errors)): ?>
 <p>Ошибка при заполнении полей, проверьте все поля.</p>

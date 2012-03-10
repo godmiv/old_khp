@@ -207,16 +207,28 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
-	public function action_setorders(){
+	public function action_addtoorder(){
 		$this->auto_render = false;
 		if(!empty($_POST)){
 			$ids = explode(',', $_POST['ids']);
 			$query = DB::select(array('max("number")', 'maxnum'))->from('orders');
 			$result = $query->execute()->as_array();
 			$nextnum = $result[0]['maxnum'] + 1;
+			if(!empty($_POST['order'])) $nextnum = Arr::get ($_POST, 'order');
 			$query = DB::update('orders')->set(array('number' => $nextnum))->where('id', 'IN', $ids);
 			$query->execute();
-			print_r($nextnum);
+			echo 'ok';
+		} else {
+			echo 'Не выбрана ни одна деталь';
+		}
+	}
+	public function action_delfromorder(){
+		$this->auto_render = false;
+		if(!empty($_POST)){
+			$ids = explode(',', $_POST['ids']);
+			$query = DB::update('orders')->set(array('number' => NULL))->where('id', 'IN', $ids);
+			$query->execute();
+			echo 'ok';
 		} else {
 			echo 'Не выбрана ни одна деталь';
 		}
