@@ -69,24 +69,27 @@ class Controller_Order extends Controller_Template {
 		}
 
 		if($_POST['oper'] == 'edit'){
-//			print_r($_POST);
-
+			//print_r($_POST);
 			$id = Arr::get($_POST,'id');
-			$query = DB::select()->from('orders')->where('id', '=', $id);
-			$f = $query->execute()->as_array();
+			$nosnas = Arr::get($_POST,'nosnas');
+			$kodinstr = Arr::get($_POST, 'kodinstr');
 
-			$f = $f[0];
-			$query="SELECT * FROM orders WHERE ((nosnas='".$f['nosnas']."' AND kodinstr ='') OR (kodinstr = '".$f['kodinstr']."'))";
+			$query="SELECT * FROM orders WHERE ((nosnas='".$nosnas."' AND kodinstr ='') OR (kodinstr = '".$kodinstr."')) AND id <> '".$id."'";
 			$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 			print_r($query);
 			if(empty ($result)){
 				$query = DB::update('orders')
 						->set(array('kodinstr' => Arr::get($_POST,'kodinstr'),
 									'nosnas' => Arr::get($_POST,'nosnas'),
+									'nazvdet' => Arr::get($_POST,'nazvdet'),
 							))
 						->where('id', '=', $id);
 				$query->execute();
 			}
+		}
+		
+		if($_POST['oper'] == 'add'){
+			
 		}
 		$this->response->body($_POST['oper']);
 	}
@@ -221,7 +224,7 @@ class Controller_Order extends Controller_Template {
 		} else {
 			echo 'Не выбрана ни одна деталь';
 		}
-	}
+ 	}
 	public function action_delfromorder(){
 		$this->auto_render = false;
 		if(!empty($_POST)){

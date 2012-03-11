@@ -6,7 +6,7 @@ $(document).ready(function(){
 		function(){
 			if(this.value != '1'){
 				$.ajax({
-					url: "../ajax/nextnumber/"+this.value,
+					url: "<?php echo URL::base()?>ajax/nextnumber/"+this.value,
 					cache: false,
 					success: function(data){
 						//alert( "data: " + data );
@@ -24,12 +24,13 @@ $(document).ready(function(){
 		}
 	)
 	//$("#box").resizable();
-	opendialog();
+	createdialog();
+		<?php if(isset ($_POST['showform'])) echo 'opendialog();';?>
 });
 
 $(function(){
 jQuery("#grid").jqGrid({
-    url:'../order/jqgrid',
+    url:'<?php echo URL::base()?>order/jqgrid',
     datatype: 'xml',
     mtype: 'POST',
    	colNames:["<?php echo implode('","',$columns);?>"],
@@ -53,7 +54,7 @@ jQuery("#grid").jqGrid({
     caption: "Детали которым не присвоен номер заказа",
 	autowidth: true,
 	height: "100%",
-	editurl: "../order/edit",
+	editurl: "<?php echo URL::base()?>order/edit",
 	multiselect: true
 
 });
@@ -61,7 +62,7 @@ jQuery("#grid").jqGrid({
 jQuery("#grid").jqGrid('navGrid','#pager',
 {edit:true,add:true,del:true}, //options
 {}, // edit options
-{}, // add options
+{beforeShowForm: function(){alert('test')}}, // add options
 {}, // del options
 {} // search options
 );
@@ -79,7 +80,7 @@ $("#grid").click(function(){
 
 $(function(){
 jQuery("#orders").jqGrid({
-    url:'../order/orders',
+    url:'<?php echo URL::base()?>order/orders',
     datatype: 'xml',
     mtype: 'POST',
    	colNames:["<?php echo implode('","',$columns);?>"],
@@ -116,17 +117,22 @@ jQuery("#orders").jqGrid('navGrid','#pagerorders',
 );
 });
 
+function createdialog(){
+	$("#dialog").dialog({
+		title: "Добавление детали",  	//тайтл, заголовок окна
+		width:550,				//ширина
+		height: 500,			//высота
+		modal: false,           	//true -  окно модальное, false - нет
+		/*buttons: {
+			"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
+			"Закрыть": function() { $(this).dialog("close"); }
+		}*/
+		autoOpen:false,
+		close: function(){$('#showform').value="false"}
+	});
+}
 function opendialog(){
-$("#dialog").dialog({
-	title: "Добавление детали",  	//тайтл, заголовок окна
-	width:550,				//ширина
-	height: 500,			//высота
-	modal: false           	//true -  окно модальное, false - нет
-	/*buttons: {
-		"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
-		"Закрыть": function() { $(this).dialog("close"); }
-	}*/
-});
+	$("#dialog").dialog('open');
 }
 function addtoorder(){
 	var s=s1=z='';
@@ -136,7 +142,7 @@ function addtoorder(){
 //alert('ids='+s+'&order='+z);
 	if(s != ''){
 		$.ajax({
-			url: "/order/addtoorder/",
+			url: "<?php echo URL::base()?>order/addtoorder/",
 			data: 'ids='+s+'&order='+z,
 			type: 'POST',
 			cache: false,
@@ -152,7 +158,7 @@ function delfromorder(){
 	s = jQuery("#orders").jqGrid('getGridParam','selarrrow');
 	if(s != ''){
 		$.ajax({
-			url: "/order/delfromorder/",
+			url: "<?php echo URL::base()?>order/delfromorder/",
 			data: 'ids='+s,
 			type: 'POST',
 			cache: false,
@@ -165,7 +171,6 @@ function delfromorder(){
 	}
 	//alert(s);
 }
-
 </script>
 <input type="button" onclick="opendialog();" value="Добавить деталь" />
 <input type="button" onclick="addtoorder();" value="Добавить детали в заказ" />
@@ -179,7 +184,7 @@ function delfromorder(){
 <?php endif ?>
 <?php
 //echo form::open('/order/add');
-echo form::open();
+echo form::open(NULL, array('id'=>'formadd'));
 ?>
 <?php
 foreach ($codifier_instr as $item){
@@ -213,10 +218,9 @@ echo form::select('osin', $opt, '', array('id'=>'osin'));
 </table>
 </div>
 <table>
-	<?php
-	echo '<tr><td>'.form::submit('add','Добавить деталь').'</td><td>'.'</td></tr>';
-	echo form::close();
-	?>
+	<?php echo '<tr><td>'.form::submit('add','Добавить деталь').'</td><td>'.'</td></tr>';?>
+	<input type="hidden" name="showform" id="showform" value="" />
+	<?php echo form::close();?>
 </table>
 </div>
 

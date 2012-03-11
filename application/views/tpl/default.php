@@ -15,7 +15,7 @@
 		<?php echo HTML::script('assets/js/jquery-ui-1.8.18.custom.min.js'), PHP_EOL ?>
 		
 		<?php echo HTML::script('assets/js/jsgantt.compressed.js'), PHP_EOL ?>
-		
+
     </head>
     <body>
 		<?=$content?>
