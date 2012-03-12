@@ -25,7 +25,8 @@ $(document).ready(function(){
 	)
 	//$("#box").resizable();
 	createdialog();
-		<?php if(isset ($_POST['showform'])) echo 'opendialog();';?>
+	<?php if(isset ($_POST['showform'])) echo 'opendialog();';?>
+	$('#addbutton').focus();
 });
 
 $(function(){
@@ -33,14 +34,14 @@ jQuery("#grid").jqGrid({
     url:'<?php echo URL::base()?>order/jqgrid',
     datatype: 'xml',
     mtype: 'POST',
-   	colNames:["<?php echo implode('","',$columns);?>"],
+   	colNames:["<?php echo implode('","',$colnames);?>"],
    	colModel:[
-		<?php foreach($columns as $col):?>
-		{name:'<?=$col;?>',
-			index:'<?=$col;?>',
-			width:75,
+		<?php foreach($columns as $key=>$col):?>
+		{name:'<?=$key;?>',
+			index:'<?=$key;?>',
+			width:<?=$col[1]?>,
 			editable:<?php
-			if($col != 'id') echo 'true';
+			if($key != 'id') echo 'true';
 			else echo 'false'
 			?>},
 		<?php endforeach;?>
@@ -52,7 +53,7 @@ jQuery("#grid").jqGrid({
     viewrecords: true,
     sortorder: "desc",
     caption: "Детали которым не присвоен номер заказа",
-	autowidth: true,
+	//autowidth: true,
 	height: "100%",
 	editurl: "<?php echo URL::base()?>order/edit",
 	multiselect: true
@@ -60,9 +61,9 @@ jQuery("#grid").jqGrid({
 });
 
 jQuery("#grid").jqGrid('navGrid','#pager',
-{edit:true,add:true,del:true}, //options
+{edit:true,add:false,del:true}, //options
 {}, // edit options
-{beforeShowForm: function(){alert('test')}}, // add options
+{}, // add options
 {}, // del options
 {} // search options
 );
@@ -83,14 +84,14 @@ jQuery("#orders").jqGrid({
     url:'<?php echo URL::base()?>order/orders',
     datatype: 'xml',
     mtype: 'POST',
-   	colNames:["<?php echo implode('","',$columns);?>"],
+   	colNames:["<?php echo implode('","',$colnames);?>"],
    	colModel:[
-		<?php foreach($columns as $col):?>
-		{name:'<?=$col;?>',
-			index:'<?=$col;?>',
-			width:75,
+		<?php foreach($columns as $key=>$col):?>
+		{name:'<?=$key;?>',
+			index:'<?=$key;?>',
+			width:<?=$col[1];?>,
 			editable:<?php
-			if($col != 'id') echo 'true';
+			if($key != 'id') echo 'true';
 			else echo 'false'
 			?>},
 		<?php endforeach;?>
@@ -102,7 +103,7 @@ jQuery("#orders").jqGrid({
     viewrecords: true,
     sortorder: "desc",
     caption: "Заказы",
-	autowidth: true,
+	//autowidth: true,
 	height: "100%",
 	//editurl: "../order/edit",
 	multiselect: true
@@ -134,12 +135,13 @@ function createdialog(){
 function opendialog(){
 	$("#dialog").dialog('open');
 }
+
 function addtoorder(){
 	var s=s1=z='';
 	s = jQuery("#grid").jqGrid('getGridParam','selarrrow');
 	s1= jQuery("#orders").jqGrid('getGridParam','selarrrow');
-	if(s1 != '') z = jQuery("#orders").jqGrid('getCell',s1,'number');
-//alert('ids='+s+'&order='+z);
+	if(s1 != 0) z = jQuery("#orders").jqGrid('getCell',s1,'number');
+//alert('ids='+s+'&order='+z+"s1="+s1);
 	if(s != ''){
 		$.ajax({
 			url: "<?php echo URL::base()?>order/addtoorder/",
@@ -172,7 +174,7 @@ function delfromorder(){
 	//alert(s);
 }
 </script>
-<input type="button" onclick="opendialog();" value="Добавить деталь" />
+<input type="button" onclick="opendialog();" id="addbutton" value="Добавить деталь" />
 <input type="button" onclick="addtoorder();" value="Добавить детали в заказ" />
 <input type="button" onclick="delfromorder();" value="Удалить детали из заказа" />
 <div id="dialog">

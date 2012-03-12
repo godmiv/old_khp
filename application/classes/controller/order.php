@@ -20,9 +20,27 @@ class Controller_Order extends Controller_Template {
 			'nizvins'	=>array('name'=>'nizvins',	'value'=>'','attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
 			);
 
-		$query = 'SELECT * FROM orders LIMIT 1';
-		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
-		$data['columns'] = array_keys($result[0]);
+		/*
+		 * Колонки, отображаемые в таблице.
+		 */
+		$columns=array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','150'),
+			'nosnas'=>array('Шифр оснастки','250'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','250'),
+			'nizins'=>array('Изв. истр.','100'),
+			'date_start'=>array('Дата выдачи заказа','100'),
+			'date_end'=>array('Дата сдачи заказа','100'),
+		);
+
+		$data['columns'] = $columns;
+		foreach ($columns as $key=>$val){
+			$data['colnames'][] = $val[0];
+		}
 
 		$query = 'SELECT * FROM codifier_instr';
 		$data['codifier_instr'] = $result = DB::query(Database::SELECT,$query)->execute()->as_array();
@@ -86,10 +104,6 @@ class Controller_Order extends Controller_Template {
 						->where('id', '=', $id);
 				$query->execute();
 			}
-		}
-		
-		if($_POST['oper'] == 'add'){
-			
 		}
 		$this->response->body($_POST['oper']);
 	}
