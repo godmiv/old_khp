@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <title></title>
-		<?php echo HTML::style('assets/css/ui-lightness/jquery-ui-1.8.16.custom.css'), PHP_EOL ?>
+		<?php echo HTML::style('assets/css/start/jquery-ui-1.8.18.custom.css'), PHP_EOL ?>
 		<?php echo HTML::style('assets/css/ui.jqgrid.css'), PHP_EOL ?>
 		
 		<?php echo HTML::style('assets/css/jsgantt.css'), PHP_EOL ?>

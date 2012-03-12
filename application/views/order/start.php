@@ -59,16 +59,16 @@ jQuery("#grid").jqGrid({
 	multiselect: true
 
 });
+//jQuery("#grid").jqGrid('gridResize');
 
 jQuery("#grid").jqGrid('navGrid','#pager',
-{edit:true,add:false,del:true}, //options
-{}, // edit options
-{}, // add options
-{}, // del options
-{} // search options
-);
+	{edit:true,add:false,del:true}, //options
+	{}, // edit options
+	{}, // add options
+	{}, // del options
+	{} // search options
+	);
 });
-
 
 //jQuery("#grid").jqGrid('gridResize',{minWidth:350,maxWidth:800,minHeight:80, maxHeight:350});
 
@@ -107,23 +107,24 @@ jQuery("#orders").jqGrid({
 	height: "100%",
 	//editurl: "../order/edit",
 	multiselect: true
+	
 });
 
 jQuery("#orders").jqGrid('navGrid','#pagerorders',
 {edit:false,add:false,del:false}, //options
-{}, // edit options
-{}, // add options
-{}, // del options
-{} // search options
+	{},// edit options
+	{},// add options
+	{},// del options
+	{multipleSearch:true}// search options
 );
 });
 
 function createdialog(){
 	$("#dialog").dialog({
-		title: "Добавление детали",  	//тайтл, заголовок окна
-		width:550,				//ширина
-		height: 500,			//высота
-		modal: false,           	//true -  окно модальное, false - нет
+		title: "Добавление детали",//тайтл, заголовок окна
+		width:550,//ширина
+		height: 500,//высота
+		modal: false,//true -  окно модальное, false - нет
 		/*buttons: {
 			"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
 			"Закрыть": function() { $(this).dialog("close"); }
@@ -141,7 +142,6 @@ function addtoorder(){
 	s = jQuery("#grid").jqGrid('getGridParam','selarrrow');
 	s1= jQuery("#orders").jqGrid('getGridParam','selarrrow');
 	if(s1 != 0) z = jQuery("#orders").jqGrid('getCell',s1,'number');
-//alert('ids='+s+'&order='+z+"s1="+s1);
 	if(s != ''){
 		$.ajax({
 			url: "<?php echo URL::base()?>order/addtoorder/",
@@ -151,7 +151,6 @@ function addtoorder(){
 			success: function(data){
 				$('#grid').trigger('reloadGrid');
 				$('#orders').trigger('reloadGrid');
-				//alert( "data: " + data );
 			}
 		});
 	}
@@ -185,7 +184,6 @@ function delfromorder(){
 <?php endforeach ?>
 <?php endif ?>
 <?php
-//echo form::open('/order/add');
 echo form::open(NULL, array('id'=>'formadd'));
 ?>
 <?php
@@ -194,15 +192,6 @@ foreach ($codifier_instr as $item){
 }
 echo form::select('osin', $opt, '', array('id'=>'osin'));
 ?>
-<table>
-	<?php
-	/*
-	foreach ($form_all as $field){
-		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::select($field['name'],$field['options'],$field['attr']['selected'],$field['attr']).'</td></tr>';
-	}
-	 */
-	?>
-</table>
 <table>
 	<?php
 	foreach ($form_osn as $field){
