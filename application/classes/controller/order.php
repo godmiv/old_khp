@@ -140,7 +140,7 @@ class Controller_Order extends Controller_Template {
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
 		$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
-		$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($start)->offset($limit);
+		//$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($start)->offset($limit);
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
 		// we should set the appropriate header information. Do not forget this.
