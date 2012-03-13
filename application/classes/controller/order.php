@@ -42,7 +42,8 @@ class Controller_Order extends Controller_Template {
 			$data['colnames'][] = $val[0];
 		}
 
-		$query = 'SELECT * FROM codifier_instr';
+		//$query = 'SELECT * FROM codifier_instr';
+		$query = DB::select()->from('codifier_instr');
 		$data['codifier_instr'] = $result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
 		if(isset($_POST['add'])){
@@ -117,7 +118,8 @@ class Controller_Order extends Controller_Template {
 		$sord = $_POST['sord'];
 		if(!$sidx) $sidx =1;
 		// calculate the number of rows for the query. We need this for paging the result
-		$query = 'SELECT * FROM orders WHERE number IS NULL';
+		//$query = 'SELECT * FROM orders WHERE number IS NULL';
+		$query = DB::select()->from('orders')->where('number', 'IS', NULL);
 		$count = DB::query(Database::SELECT,$query)->execute()->count();
 
 		// calculate the total pages for the query
@@ -138,6 +140,7 @@ class Controller_Order extends Controller_Template {
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
 		$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
+		//$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($start)->offset($limit);
 		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
 		// we should set the appropriate header information. Do not forget this.
