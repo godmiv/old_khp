@@ -93,9 +93,21 @@ class Controller_Order extends Controller_Template {
 			$nosnas = Arr::get($_POST,'nosnas');
 			$kodinstr = Arr::get($_POST, 'kodinstr');
 
-			$query="SELECT * FROM orders WHERE ((nosnas='".$nosnas."' AND kodinstr ='') OR (kodinstr = '".$kodinstr."')) AND id <> '".$id."'";
-			$result = DB::query(Database::SELECT,$query)->execute()->as_array();
-			print_r($query);
+			//$query="SELECT * FROM orders WHERE ((nosnas='".$nosnas."' AND kodinstr ='') OR (kodinstr = '".$kodinstr."')) AND id <> '".$id."'";
+			//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+			$query = DB::select()->from('orders');
+			$query->where_open()
+				->where_open()
+				->where('nosnas','=',$nosnas)
+				->and_where('kodinstr', '=', '')
+				->where_close()
+				->where_open()
+				->or_where('kodinstr', '=', $kodinstr)
+				->where_close()
+				->where_close()
+				->and_where('id', '<>', $id);
+			$result = $query->execute()->as_array();
+			//print_r($query);
 			if(empty ($result)){
 				$query = DB::update('orders')
 						->set(array('kodinstr' => Arr::get($_POST,'kodinstr'),
@@ -139,9 +151,10 @@ class Controller_Order extends Controller_Template {
 		// if for some reasons start position is negative set it to 0
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
-		$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
-		//$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($start)->offset($limit);
-		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+		//$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
+		//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+		$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($limit)->offset($start);
+		$result =$query->execute()->as_array();
 
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
@@ -178,9 +191,12 @@ class Controller_Order extends Controller_Template {
 		$sord = $_POST['sord'];
 		if(!$sidx) $sidx =1;
 		// calculate the number of rows for the query. We need this for paging the result
-		$query = 'SELECT * FROM orders WHERE number IS NOT NULL';
-		$count = DB::query(Database::SELECT,$query)->execute()->count();
-
+		//$query = 'SELECT * FROM orders WHERE number IS NOT NULL';
+		//$count = DB::query(Database::SELECT,$query)->execute()->count();
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL);
+		$count = $query->execute()->count();
+		
 		// calculate the total pages for the query
 		if( $count > 0 && $limit > 0) {
 			$total_pages = ceil($count/$limit);
@@ -198,9 +214,10 @@ class Controller_Order extends Controller_Template {
 		// if for some reasons start position is negative set it to 0
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
-		$query = 'SELECT * FROM orders WHERE number IS NOT NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
-		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
-
+		//$query = 'SELECT * FROM orders WHERE number IS NOT NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
+		//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+		$query = DB::select()->from('orders')->where('number','IS NOT', NULL)->order_by($sidx,$sord)->limit($limit)->offset($start);
+		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
 

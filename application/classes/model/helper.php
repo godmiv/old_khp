@@ -10,8 +10,8 @@ Class Model_helper extends Model
 	}
 
 	public static function validateNosnas($value){
-		$query = 'SELECT nosnas FROM `orders` WHERE nosnas = "'.$value.'"';
-		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
+		$query = DB::select()->from('orders')->where('nosnas','=',$value);
+		$result = $query->execute()->as_array();
 		if(!empty($result)) return FALSE;
 		else return TRUE;
 	}

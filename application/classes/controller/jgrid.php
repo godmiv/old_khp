@@ -32,9 +32,14 @@ class Controller_jgrid extends Controller {
 		if(!$sidx) $sidx =1;
  
 		// calculate the number of rows for the query. We need this for paging the result 
-		$query = 'SELECT products.*, products_types.name as type FROM products LEFT JOIN products_types ON products.type_id=products_types.id where products.parrent_id='.$parrent_id;
-		$count = DB::query(Database::SELECT,$query)->execute()->count();
-
+		//$query = 'SELECT products.*, products_types.name as type FROM products LEFT JOIN products_types ON products.type_id=products_types.id where products.parrent_id='.$parrent_id;
+		//$count = DB::query(Database::SELECT,$query)->execute()->count();
+		$query = DB::select('products.*',array('products_types.name','type'))
+				->from('products')
+				->join('products_types', 'LEFT')
+				->on('products.type_id','=','products_types.id')
+				->where('products.parrent_id','=',$parrent_id);
+		$count = $query->execute()->count();
 		// calculate the total pages for the query 
 		if( $count > 0 && $limit > 0) { 
 			$total_pages = ceil($count/$limit); 
@@ -52,17 +57,18 @@ class Controller_jgrid extends Controller {
 		// if for some reasons start position is negative set it to 0 
 		// typical case is that the user type 0 for the requested page 
 		if($start <0) $start = 0; 
-		$query = 'SELECT
-			products.id as id,
-			products.name as name,
-			products.code as code,
-			products_types.name as type
-			FROM products 
-			LEFT JOIN products_types 
-			ON products.type_id=products_types.id 
-			WHERE products.parrent_id= '.$parrent_id.' ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
-		$result = DB::query(Database::SELECT,$query)->execute()->as_array();
-
+		$query = DB::select(
+		 		array('products.id','id'),
+				array('products.name','name'),
+				array('products.code','code'),
+				array('products_types.name','type'))
+				->from('products')
+				->join('products_types','LEFT')->on('products.type_id','=','products_types.id')
+				->where('products.parrent_id','=',$parrent_id)
+				->order_by($sidx,$sord)
+				->limit($limit)->offset($start);
+		$result = $query->execute()->as_array();
+		
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
 
