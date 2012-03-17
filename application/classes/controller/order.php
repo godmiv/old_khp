@@ -151,6 +151,7 @@ class Controller_Order extends Controller_Template {
 		// if for some reasons start position is negative set it to 0
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
+
 		//$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
 		//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 		$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($limit)->offset($start);
@@ -196,7 +197,7 @@ class Controller_Order extends Controller_Template {
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL);
 		$count = $query->execute()->count();
-		
+
 		// calculate the total pages for the query
 		if( $count > 0 && $limit > 0) {
 			$total_pages = ceil($count/$limit);
