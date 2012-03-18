@@ -4,6 +4,26 @@ class Controller_Order extends Controller_Template {
 
 	public $template = 'tpl/default';
 
+	/*
+	 * Колонки, отображаемые в таблице.
+	 *
+	 */
+
+	public $columns=array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','150'),
+			'nosnas'=>array('Шифр оснастки','250'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','250'),
+			'nizvins'=>array('Изв. истр.','100'),
+			//'date_start'=>array('Дата выдачи заказа','100'),
+			//'date_end'=>array('Дата сдачи заказа','100'),
+			'text'=>array('Текст','250','textarea')
+		);
+
 	public function action_start(){
 
 		$data['title'] = 'Открытие заказа';
@@ -13,32 +33,18 @@ class Controller_Order extends Controller_Template {
 			'nazvdet'	=>array('name'=>'nazvdet',	'value'=>'','attr'=>array('desc'=>'Название детали', 'id'=>'nazvdet')),
 			'nosnas'	=>array('name'=>'nosnas',	'value'=>'','attr'=>array('desc'=>'Шифр оснастки', 'id'=>'nosnas')),
 			'nizv'		=>array('name'=>'nizv',		'value'=>'','attr'=>array('desc'=>'Извещение оснастки', 'id'=>'nizv')),
-			);
+		);
 
 		$data['form_ins'] = array(
 			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>'','attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr', 'readonly'=>'readonly')),
 			'nizvins'	=>array('name'=>'nizvins',	'value'=>'','attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
-			);
-
-		/*
-		 * Колонки, отображаемые в таблице.
-		 */
-		$columns=array(
-			'id'=>array('ID','30'),
-			'number'=>array('№ заказа','70'),
-			'status'=>array('Статус','70'),
-			'detalavto'=>array('Деталь автомобиля','150'),
-			'nazvdet'=>array('Название детали','150'),
-			'nosnas'=>array('Шифр оснастки','250'),
-			'nizv'=>array('Изв. оснастки','100'),
-			'kodinstr'=>array('Шифр инструмента','250'),
-			'nizins'=>array('Изв. истр.','100'),
-			'date_start'=>array('Дата выдачи заказа','100'),
-			'date_end'=>array('Дата сдачи заказа','100'),
+		);
+		$data['form_all'] = array(
+			'text'		=>array('name'=>'text', 'value'=>'', 'attr'=>array('desc'=>'Текст заказа', 'id'=>'text', 'cols'=>'30', 'rows'=>'5')),
 		);
 
-		$data['columns'] = $columns;
-		foreach ($columns as $key=>$val){
+		$data['columns'] = $this->columns;
+		foreach ($this->columns as $key=>$val){
 			$data['colnames'][] = $val[0];
 		}
 
@@ -56,14 +62,15 @@ class Controller_Order extends Controller_Template {
 			}
 			$post->rule('nazvdet', 'not_empty');
 			if($post->check()){
-				$query = DB::insert('orders', array('detalavto','nazvdet','nosnas','nizv','kodinstr','nizvins'))
+				$query = DB::insert('orders', array('detalavto','nazvdet','nosnas','nizv','kodinstr','nizvins','text'))
 						->values(array(
 							Arr::get($_POST, 'detalavto'),
 							Arr::get($_POST, 'nazvdet'),
 							Arr::get($_POST, 'nosnas'),
 							Arr::get($_POST, 'nizv'),
 							Arr::get($_POST, 'kodinstr'),
-							Arr::get($_POST, 'nizvins')
+							Arr::get($_POST, 'nizvins'),
+							Arr::get($_POST, 'text'),
 							));
 				$query->execute();
 				Request::current()->redirect('order/start');
@@ -72,7 +79,6 @@ class Controller_Order extends Controller_Template {
 				//$this->template->content = 'Ошибка добавления записи в базу.';
 			}
 		}
-
 		$this->template->content = View::factory('order/start',$data);
 	}
 	/*
@@ -92,9 +98,8 @@ class Controller_Order extends Controller_Template {
 			$id = Arr::get($_POST,'id');
 			$nosnas = Arr::get($_POST,'nosnas');
 			$kodinstr = Arr::get($_POST, 'kodinstr');
+			$text = Arr::get($_POST, 'text');
 
-			//$query="SELECT * FROM orders WHERE ((nosnas='".$nosnas."' AND kodinstr ='') OR (kodinstr = '".$kodinstr."')) AND id <> '".$id."'";
-			//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 			$query = DB::select()->from('orders');
 			$query->where_open()
 				->where_open()
@@ -107,21 +112,22 @@ class Controller_Order extends Controller_Template {
 				->where_close()
 				->and_where('id', '<>', $id);
 			$result = $query->execute()->as_array();
-			//print_r($query);
 			if(empty ($result)){
 				$query = DB::update('orders')
 						->set(array('kodinstr' => Arr::get($_POST,'kodinstr'),
 									'nosnas' => Arr::get($_POST,'nosnas'),
 									'nazvdet' => Arr::get($_POST,'nazvdet'),
+									'text' => Arr::get($_POST,'text'),
 							))
 						->where('id', '=', $id);
 				$query->execute();
+				print_r($query);
 			}
 		}
 		$this->response->body($_POST['oper']);
 	}
 
-	public function action_jqgrid(){
+	public function action_detal(){
 
 		$this->auto_render = false;
 		$page = $_POST['page'];
@@ -130,7 +136,6 @@ class Controller_Order extends Controller_Template {
 		$sord = $_POST['sord'];
 		if(!$sidx) $sidx =1;
 		// calculate the number of rows for the query. We need this for paging the result
-		//$query = 'SELECT * FROM orders WHERE number IS NULL';
 		$query = DB::select()->from('orders')->where('number', 'IS', NULL);
 		$count = DB::query(Database::SELECT,$query)->execute()->count();
 
@@ -152,8 +157,6 @@ class Controller_Order extends Controller_Template {
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
 
-		//$query = 'SELECT * FROM orders WHERE number IS NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
-		//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 		$query = DB::select()->from('orders')->where('number','IS',NULL)->order_by($sidx, $sord)->limit($limit)->offset($start);
 		$result =$query->execute()->as_array();
 
@@ -166,7 +169,7 @@ class Controller_Order extends Controller_Template {
 		$s .= "<total>".$total_pages."</total>";
 		$s .= "<records>".$count."</records>";
 
-		$fields = array_keys($result[0]);
+		$fields = array_keys($this->columns);
 		//print_r($fields);
 		// be sure to put text data in CDATA
 		foreach($result as $row){
@@ -177,6 +180,61 @@ class Controller_Order extends Controller_Template {
 				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
 			}
 
+			$s .= "</row>";
+		}
+		$s .= "</rows>";
+		$this->response->body($s);
+	}
+
+	public function action_started(){
+
+		$this->auto_render = false;
+		$page = $_POST['page'];
+		$limit = $_POST['rows'];
+		$sidx = $_POST['sidx'];
+		$sord = $_POST['sord'];
+		if(!$sidx) $sidx =1;
+		// calculate the number of rows for the query. We need this for paging the result
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL);
+		$count = $query->execute()->count();
+
+		// calculate the total pages for the query
+		if( $count > 0 && $limit > 0) {
+			$total_pages = ceil($count/$limit);
+		} else {
+			$total_pages = 0;
+		}
+
+		// if for some reasons the requested page is greater than the total
+		// set the requested page to total page
+		if ($page > $total_pages) $page=$total_pages;
+
+		// calculate the starting position of the rows
+		$start = $limit*$page - $limit;
+
+		// if for some reasons start position is negative set it to 0
+		// typical case is that the user type 0 for the requested page
+		if($start <0) $start = 0;
+		$query = DB::select()->from('orders')->where('number','IS NOT', NULL)->order_by($sidx,$sord)->limit($limit)->offset($start);
+		$result = $query->execute()->as_array();
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+
+		$s = "<?xml version='1.0' encoding='utf-8'?>";
+		$s .= "<rows>";
+		$s .= "<page>".$page."</page>";
+		$s .= "<total>".$total_pages."</total>";
+		$s .= "<records>".$count."</records>";
+
+		$fields = array_keys($this->columns);
+
+		// be sure to put text data in CDATA
+		foreach($result as $row){
+			$s .= "<row id='". $row['id']."'>";
+			foreach($fields as $key=>$val) {
+				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
+			}
 			$s .= "</row>";
 		}
 		$s .= "</rows>";
@@ -228,8 +286,7 @@ class Controller_Order extends Controller_Template {
 		$s .= "<total>".$total_pages."</total>";
 		$s .= "<records>".$count."</records>";
 
-		$fields = array_keys($result[0]);
-		//print_r($fields);
+		$fields = array_keys($this->columns);
 		// be sure to put text data in CDATA
 		foreach($result as $row){
 			$s .= "<row id='". $row['id']."'>";
