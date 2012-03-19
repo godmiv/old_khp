@@ -30,21 +30,25 @@ $(document).ready(function(){
 });
 
 $(function(){
-jQuery("#grid").jqGrid({
-    url:'<?php echo URL::base()?>order/jqgrid',
+jQuery("#detal").jqGrid({
+    url:'<?php echo URL::base()?>order/detal',
     datatype: 'xml',
     mtype: 'POST',
    	colNames:["<?php echo implode('","',$colnames);?>"],
    	colModel:[
-		<?php foreach($columns as $key=>$col):?>
-		{name:'<?=$key;?>',
-			index:'<?=$key;?>',
-			width:<?=$col[1]?>,
-			editable:<?php
-			if($key != 'id') echo 'true';
-			else echo 'false'
-			?>},
-		<?php endforeach;?>
+		<?php foreach($columns as $key=>$col){
+			echo "{name:'$key',";
+			echo "index:'$key',";
+			echo "width:'$col[1]',";
+			if ($key == 'text'){
+				echo "edittype:'textarea',";
+				echo "editoptions: {rows:'5',cols:'50'},";
+			}
+			echo "editable:";
+			if($key != 'id') echo "true},\r\n";
+			else echo "false},\r\n";
+			//echo '},';
+		};?>
    	],
    	rowNum:10,
    	rowList:[10,20,30],
@@ -61,7 +65,7 @@ jQuery("#grid").jqGrid({
 });
 //jQuery("#grid").jqGrid('gridResize');
 
-jQuery("#grid").jqGrid('navGrid','#pager',
+jQuery("#detal").jqGrid('navGrid','#pager',
 	{edit:true,add:false,del:true}, //options
 	{}, // edit options
 	{}, // add options
@@ -72,8 +76,8 @@ jQuery("#grid").jqGrid('navGrid','#pager',
 
 //jQuery("#grid").jqGrid('gridResize',{minWidth:350,maxWidth:800,minHeight:80, maxHeight:350});
 
-$("#grid").click(function(){
-	var gr = jQuery("#grid").jqGrid('getGridParam','selrow');
+$("#detal").click(function(){
+	var gr = jQuery("#detal").jqGrid('getGridParam','selrow');
 	alert (gr);
 	//if( gr != null ) jQuery("#grid").jqGrid('editGridRow',gr,{height:280,reloadAfterSubmit:false});
 	//else alert("Please Select Row");
@@ -102,28 +106,66 @@ jQuery("#orders").jqGrid({
    	sortname: 'number',
     viewrecords: true,
     sortorder: "desc",
-    caption: "Заказы",
+    caption: "Детали которым присвоен номер заказа",
 	//autowidth: true,
 	height: "100%",
 	//editurl: "../order/edit",
 	multiselect: true
-	
 });
 
 jQuery("#orders").jqGrid('navGrid','#pagerorders',
-{edit:false,add:false,del:false}, //options
+	{edit:false,add:false,del:false}, //options
 	{},// edit options
 	{},// add options
 	{},// del options
 	{multipleSearch:true}// search options
-);
+	);
+});
+
+$(function(){
+jQuery("#startedorders").jqGrid({
+    url:'<?php echo URL::base()?>order/started',
+    datatype: 'xml',
+    mtype: 'POST',
+   	colNames:["<?php echo implode('","',$colnames);?>"],
+   	colModel:[
+		<?php foreach($columns as $key=>$col):?>
+		{name:'<?=$key;?>',
+			index:'<?=$key;?>',
+			width:<?=$col[1];?>,
+			editable:<?php
+			if($key != 'id') echo 'true';
+			else echo 'false'
+			?>},
+		<?php endforeach;?>
+   	],
+   	rowNum:5,
+   	rowList:[5,10,20,30],
+   	pager: '#pagerstartedorders',
+   	sortname: 'number',
+    viewrecords: true,
+    sortorder: "desc",
+    caption: "Выданные заказы",
+	//autowidth: true,
+	height: "100%",
+	//editurl: "../order/edit",
+	multiselect: true
+});
+
+jQuery("#startedorders").jqGrid('navGrid','#pagerstartedorders',
+	{edit:false,add:false,del:false}, //options
+	{},// edit options
+	{},// add options
+	{},// del options
+	{multipleSearch:true}// search options
+	);
 });
 
 function createdialog(){
 	$("#dialog").dialog({
 		title: "Добавление детали",//тайтл, заголовок окна
-		width:550,//ширина
-		height: 500,//высота
+		width: 550,//ширина
+		height: 600,//высота
 		modal: false,//true -  окно модальное, false - нет
 		/*buttons: {
 			"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
@@ -139,7 +181,7 @@ function opendialog(){
 
 function addtoorder(){
 	var s=s1=z='';
-	s = jQuery("#grid").jqGrid('getGridParam','selarrrow');
+	s = jQuery("#detal").jqGrid('getGridParam','selarrrow');
 	s1= jQuery("#orders").jqGrid('getGridParam','selarrrow');
 	if(s1 != 0) z = jQuery("#orders").jqGrid('getCell',s1,'number');
 	if(s != ''){
@@ -149,7 +191,7 @@ function addtoorder(){
 			type: 'POST',
 			cache: false,
 			success: function(data){
-				$('#grid').trigger('reloadGrid');
+				$('#detal').trigger('reloadGrid');
 				$('#orders').trigger('reloadGrid');
 			}
 		});
@@ -164,7 +206,7 @@ function delfromorder(){
 			type: 'POST',
 			cache: false,
 			success: function(data){
-				$('#grid').trigger("reloadGrid");
+				$('#detal').trigger("reloadGrid");
 				$('#orders').trigger("reloadGrid");
 				//alert( "data: " + data );
 			}
@@ -173,6 +215,7 @@ function delfromorder(){
 	//alert(s);
 }
 </script>
+<h3>Выдача заказов</h3>
 <input type="button" onclick="opendialog();" id="addbutton" value="Добавить деталь" />
 <input type="button" onclick="addtoorder();" value="Добавить детали в заказ" />
 <input type="button" onclick="delfromorder();" value="Удалить детали из заказа" />
@@ -209,15 +252,28 @@ echo form::select('osin', $opt, '', array('id'=>'osin'));
 </table>
 </div>
 <table>
+	<?php
+	foreach ($form_all as $field){
+		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::textarea($field['name'], $field['value'], $field['attr']).'</td></tr>';
+	}
+	?>
+</table>
+
+
+
+<table>
 	<?php echo '<tr><td>'.form::submit('add','Добавить деталь').'</td><td>'.'</td></tr>';?>
+</table>
 	<input type="hidden" name="showform" id="showform" value="" />
 	<?php echo form::close();?>
-</table>
 </div>
 
-<table id="grid"></table>
+<table id="detal"></table>
 <div id="pager"></div>
-
-<div>Заказы</div>
+<br />
 <table id="orders"></table>
 <div id="pagerorders"></div>
+<input type="button" onclick="startorder();" value="Выдать заказ" />
+<br />
+<table id="startedorders"></table>
+<div id="pagerstartedorders"></div>
