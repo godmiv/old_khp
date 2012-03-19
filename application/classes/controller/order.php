@@ -4,11 +4,12 @@ class Controller_Order extends Controller_Template {
 
 	public $template = 'tpl/default';
 
+	public $user = array('login'=>'testuser','group'=>'testgroup');
+
 	/*
 	 * Колонки, отображаемые в таблице.
 	 *
 	 */
-
 	public $columns=array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -48,7 +49,6 @@ class Controller_Order extends Controller_Template {
 			$data['colnames'][] = $val[0];
 		}
 
-		//$query = 'SELECT * FROM codifier_instr';
 		$query = DB::select()->from('codifier_instr');
 		$data['codifier_instr'] = $result = DB::query(Database::SELECT,$query)->execute()->as_array();
 
@@ -173,12 +173,9 @@ class Controller_Order extends Controller_Template {
 		// be sure to put text data in CDATA
 		foreach($result as $row){
 			$s .= "<row id='". $row['id']."'>";
-			//$s .= "<cell></cell>"; //это для пустой колонки Actions - если не передать пустое значение -в jqgrid колонки сдвигаются, получается каша
-
 			foreach($fields as $key=>$val) {
 				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
 			}
-
 			$s .= "</row>";
 		}
 		$s .= "</rows>";
@@ -250,8 +247,6 @@ class Controller_Order extends Controller_Template {
 		$sord = $_POST['sord'];
 		if(!$sidx) $sidx =1;
 		// calculate the number of rows for the query. We need this for paging the result
-		//$query = 'SELECT * FROM orders WHERE number IS NOT NULL';
-		//$count = DB::query(Database::SELECT,$query)->execute()->count();
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL);
 		$count = $query->execute()->count();
@@ -274,8 +269,6 @@ class Controller_Order extends Controller_Template {
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
 
-		//$query = 'SELECT * FROM orders WHERE number IS NOT NULL ORDER BY '.$sidx.' '.$sord.' LIMIT '.$start.','.$limit;
-		//$result = DB::query(Database::SELECT,$query)->execute()->as_array();
 		$query = DB::select()->from('orders')->where('number','IS NOT', NULL)->order_by($sidx,$sord)->limit($limit)->offset($start);
 		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
@@ -291,12 +284,9 @@ class Controller_Order extends Controller_Template {
 		// be sure to put text data in CDATA
 		foreach($result as $row){
 			$s .= "<row id='". $row['id']."'>";
-			//$s .= "<cell></cell>"; //это для пустой колонки Actions - если не передать пустое значение -в jqgrid колонки сдвигаются, получается каша
-
 			foreach($fields as $key=>$val) {
 				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
 			}
-
 			$s .= "</row>";
 		}
 		$s .= "</rows>";
