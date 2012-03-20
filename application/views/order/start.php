@@ -34,9 +34,9 @@ jQuery("#detal").jqGrid({
     url:'<?php echo URL::base()?>order/detal',
     datatype: 'xml',
     mtype: 'POST',
-   	colNames:["<?php echo implode('","',$colnames);?>"],
+   	colNames:["<?php echo implode('","',$colnames['detal']);?>"],
    	colModel:[
-		<?php foreach($columns as $key=>$col){
+		<?php foreach($columns['detal'] as $key=>$col){
 			echo "{name:'$key',";
 			echo "index:'$key',";
 			echo "width:'$col[1]',";
@@ -56,7 +56,7 @@ jQuery("#detal").jqGrid({
    	sortname: 'id',
     viewrecords: true,
     sortorder: "desc",
-    caption: "Детали которым не присвоен номер заказа",
+    caption: "Детали, которым не присвоен номер заказа",
 	//autowidth: true,
 	height: "100%",
 	editurl: "<?php echo URL::base()?>order/edit",
@@ -88,9 +88,9 @@ jQuery("#orders").jqGrid({
     url:'<?php echo URL::base()?>order/orders',
     datatype: 'xml',
     mtype: 'POST',
-   	colNames:["<?php echo implode('","',$colnames);?>"],
+   	colNames:["<?php echo implode('","',$colnames['orders']);?>"],
    	colModel:[
-		<?php foreach($columns as $key=>$col):?>
+		<?php foreach($columns['orders'] as $key=>$col):?>
 		{name:'<?=$key;?>',
 			index:'<?=$key;?>',
 			width:<?=$col[1];?>,
@@ -106,7 +106,7 @@ jQuery("#orders").jqGrid({
    	sortname: 'number',
     viewrecords: true,
     sortorder: "desc",
-    caption: "Детали которым присвоен номер заказа",
+    caption: "Детали, которым присвоен номер заказа",
 	//autowidth: true,
 	height: "100%",
 	//editurl: "../order/edit",
@@ -127,9 +127,9 @@ jQuery("#startedorders").jqGrid({
     url:'<?php echo URL::base()?>order/started',
     datatype: 'xml',
     mtype: 'POST',
-   	colNames:["<?php echo implode('","',$colnames);?>"],
+   	colNames:["<?php echo implode('","',$colnames['startedorders']);?>"],
    	colModel:[
-		<?php foreach($columns as $key=>$col):?>
+		<?php foreach($columns['startedorders'] as $key=>$col):?>
 		{name:'<?=$key;?>',
 			index:'<?=$key;?>',
 			width:<?=$col[1];?>,
@@ -193,6 +193,7 @@ function addtoorder(){
 			success: function(data){
 				$('#detal').trigger('reloadGrid');
 				$('#orders').trigger('reloadGrid');
+				//$('#startedorders').trigger('reloadGrid');
 			}
 		});
 	}
@@ -208,11 +209,28 @@ function delfromorder(){
 			success: function(data){
 				$('#detal').trigger("reloadGrid");
 				$('#orders').trigger("reloadGrid");
-				//alert( "data: " + data );
+				//$('#startedorders').trigger('reloadGrid');
 			}
 		});
 	}
 	//alert(s);
+}
+function startorder(){
+	s = jQuery("#orders").jqGrid('getGridParam','selarrrow');
+	if(s != ''){
+		$.ajax({
+			url: "<?php echo URL::base()?>order/startorder/",
+			data: 'ids='+s,
+			type: 'POST',
+			cache: false,
+			success: function(data){
+				//$('#detal').trigger("reloadGrid");
+				$('#orders').trigger("reloadGrid");
+				$('#startedorders').trigger('reloadGrid');
+				//alert( "data: " + data );
+			}
+		});
+	}
 }
 </script>
 <h3>Выдача заказов</h3>
