@@ -67,10 +67,10 @@ jQuery("#detal").jqGrid({
 
 jQuery("#detal").jqGrid('navGrid','#pager',
 	{edit:true,add:false,del:true}, //options
-	{}, // edit options
+	{width:650}, // edit options
 	{}, // add options
-	{}, // del options
-	{} // search options
+	{width:320}, // del options
+	{multipleSearch:true, width:600} // search options
 	);
 });
 
@@ -118,7 +118,7 @@ jQuery("#orders").jqGrid('navGrid','#pagerorders',
 	{},// edit options
 	{},// add options
 	{},// del options
-	{multipleSearch:true}// search options
+	{multipleSearch:true, width:600}// search options
 	);
 });
 
@@ -157,7 +157,7 @@ jQuery("#startedorders").jqGrid('navGrid','#pagerstartedorders',
 	{},// edit options
 	{},// add options
 	{},// del options
-	{multipleSearch:true}// search options
+	{multipleSearch:true, width:600}// search options
 	);
 });
 
