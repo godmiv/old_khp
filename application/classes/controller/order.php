@@ -176,6 +176,7 @@ class Controller_Order extends Controller_Template {
 		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS', NULL)
+				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login']);
 		//echo $query;
 		$count = DB::query(Database::SELECT,$query)->execute()->count();
@@ -199,6 +200,7 @@ class Controller_Order extends Controller_Template {
 		if($start <0) $start = 0;
 		$query = DB::select()->from('orders')
 				->where('number','IS',NULL)
+				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login'])
 				->order_by($sidx, $sord)->limit($limit)->offset($start);
 		$result =$query->execute()->as_array();
@@ -237,6 +239,7 @@ class Controller_Order extends Controller_Template {
 		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL)
+				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login'])
 				//->and_where('status', '<>', 'start')
 				;
@@ -263,7 +266,7 @@ class Controller_Order extends Controller_Template {
 		$query = DB::select()->from('orders')
 				->where('number','IS NOT', NULL)
 				->and_where('user_start', '=', $this->user['login'])
-				//->and_where('status', '<>', 'start')
+				->and_where('status', 'IS', NULL)
 				->order_by($sidx,$sord)->limit($limit)->offset($start);
 		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
@@ -297,7 +300,8 @@ class Controller_Order extends Controller_Template {
 		if(!$sidx) $sidx =1;
 		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
-				->where('number', 'IS NOT', NULL);
+				->where('number', 'IS NOT', NULL)
+				->and_where('status', '=', 'start');
 		$count = $query->execute()->count();
 
 		// calculate the total pages for the query
@@ -318,7 +322,10 @@ class Controller_Order extends Controller_Template {
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
 
-		$query = DB::select()->from('orders')->where('number','IS NOT', NULL)->order_by($sidx,$sord)->limit($limit)->offset($start);
+		$query = DB::select()->from('orders')
+				->where('number','IS NOT', NULL)
+				->and_where('status', '=', 'start')
+				->order_by($sidx,$sord)->limit($limit)->offset($start);
 		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
