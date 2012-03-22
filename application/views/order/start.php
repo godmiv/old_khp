@@ -238,11 +238,13 @@ function startorder(){
 <input type="button" onclick="delfromorder();" value="Удалить детали из заказа" />
 <div id="dialog">
 <?php if (isset($errors)): ?>
-<p>Ошибка при заполнении полей, проверьте все поля.</p>
-<?php foreach ($errors as $message): ?>
-    <?php echo $message ?><br />
-<?php endforeach ?>
-<?php endif ?>
+	<div class="ui-state-error ui-dialog-titlebar ui-corner-all ui-helper-clearfix">
+	Ошибка при заполнении полей, проверьте все поля.</div>
+	<?php foreach ($errors as $message): ?>
+	    <?php echo $message ?><br />
+	<?php endforeach ?>
+	
+	<?php endif ?>
 <?php
 echo form::open(NULL, array('id'=>'formadd'));
 ?>
