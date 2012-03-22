@@ -168,6 +168,7 @@ class Controller_Order extends Controller_Template {
 	public function action_detal(){
 
 		$this->auto_render = false;
+
 		$page = $_POST['page'];
 		$limit = $_POST['rows'];
 		$sidx = $_POST['sidx'];
@@ -178,7 +179,12 @@ class Controller_Order extends Controller_Template {
 				->where('number', 'IS', NULL)
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login']);
-		//echo $query;
+		
+		// Добавляем условия для поиска
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
+
 		$count = DB::query(Database::SELECT,$query)->execute()->count();
 
 		// calculate the total pages for the query
@@ -203,6 +209,12 @@ class Controller_Order extends Controller_Template {
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login'])
 				->order_by($sidx, $sord)->limit($limit)->offset($start);
+		
+		// Добавляем условия для поиска
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
+		//echo $query;
 		$result =$query->execute()->as_array();
 
 		// we should set the appropriate header information. Do not forget this.
@@ -243,6 +255,9 @@ class Controller_Order extends Controller_Template {
 				->and_where('user_start', '=', $this->user['login'])
 				//->and_where('status', '<>', 'start')
 				;
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
 		$count = $query->execute()->count();
 
 		// calculate the total pages for the query
@@ -268,6 +283,9 @@ class Controller_Order extends Controller_Template {
 				->and_where('user_start', '=', $this->user['login'])
 				->and_where('status', 'IS', NULL)
 				->order_by($sidx,$sord)->limit($limit)->offset($start);
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
 		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
@@ -302,6 +320,9 @@ class Controller_Order extends Controller_Template {
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL)
 				->and_where('status', '=', 'start');
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
 		$count = $query->execute()->count();
 
 		// calculate the total pages for the query
@@ -326,6 +347,9 @@ class Controller_Order extends Controller_Template {
 				->where('number','IS NOT', NULL)
 				->and_where('status', '=', 'start')
 				->order_by($sidx,$sord)->limit($limit)->offset($start);
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
 		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
@@ -394,5 +418,40 @@ class Controller_Order extends Controller_Template {
 			return TRUE;
 		}
 		else return FALSE;
+	}
+
+	/*
+	 * Добавляет условия для поиска в запрос.
+	 * @param $q Запрос, в который добавляются условия
+	 * @param $p Объект json_decode, содержащий параметры поиска
+	 */
+	public function createwhere($q,$p) {
+		//print_r($p);
+		$q->where_open();
+		if($p->groupOp == 'AND') $w = 'and_where';
+		if($p->groupOp == 'OR') $w = 'or_where';
+		foreach ($p->rules as $rule) {
+			//['eq','ne','lt','le','gt','ge','bw','bn','in','ni','ew','en','cn','nc']
+			switch ($rule->op) {
+				case 'eq': $q->$w($rule->field, '=', $rule->data); break; // равно
+				case 'ne': $q->$w($rule->field, '<>', $rule->data); break; // не равно
+				case 'lt': $q->$w($rule->field, '<', $rule->data); break; // меньше
+				case 'le': $q->$w($rule->field, '<=', $rule->data); break; // меньше или равно
+				case 'gt': $q->$w($rule->field, '>', $rule->data); break; // больше	
+				case 'ge': $q->$w($rule->field, '>=', $rule->data); break; // больше или равно
+				case 'bw': $q->$w($rule->field, 'LIKE', $rule->data.'%'); break; // начинается с
+				case 'bn': $q->$w($rule->field, 'NOT LIKE', $rule->data.'%'); break; // не начинается с
+				case 'ew': $q->$w($rule->field, 'LIKE', '%'.$rule->data); break; // заканчивается на
+				case 'en': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data); break; // не заканчивается на 
+				case 'cn': $q->$w($rule->field, 'LIKE', '%'.$rule->data.'%'); break; // содержит
+				case 'nс': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data.'%'); break; // не содержит
+				case 'nu': $q->$w($rule->field, 'IS', NULL); break; // is null
+				case 'nn': $q->$w($rule->field, 'IS NOT', NULL); break; // is not null
+				case 'in': $q->$w($rule->field, 'IN', explode(',', $rule->data)); break; // находится в
+				case 'ni': $q->$w($rule->field, 'NOT IN', explode(',', $rule->data)); break; // не находится в
+				//default: 
+			}
+		}
+		$q->where_close();
 	}
 }

@@ -70,11 +70,10 @@ jQuery("#detal").jqGrid('navGrid','#pager',
 	{width:650}, // edit options
 	{}, // add options
 	{width:320}, // del options
-	{multipleSearch:true, width:600} // search options
+	{multipleSearch:true, sopt:['eq','ne','lt','le','gt','ge','bw','bn','ew','en','cn','nc','in','ni'], width:600} // search options
 	);
 });
-
-//jQuery("#grid").jqGrid('gridResize',{minWidth:350,maxWidth:800,minHeight:80, maxHeight:350});
+//jQuery("#detal").jqGrid('gridResize',{minWidth:350,maxWidth:800,minHeight:80, maxHeight:350});
 
 $("#detal").click(function(){
 	var gr = jQuery("#detal").jqGrid('getGridParam','selrow');
@@ -118,7 +117,7 @@ jQuery("#orders").jqGrid('navGrid','#pagerorders',
 	{},// edit options
 	{},// add options
 	{},// del options
-	{multipleSearch:true, width:600}// search options
+	{multipleSearch:true, sopt:['eq','ne','lt','le','gt','ge','bw','bn','ew','en','cn','nc','in','ni'], width:600}// search options
 	);
 });
 
@@ -157,7 +156,7 @@ jQuery("#startedorders").jqGrid('navGrid','#pagerstartedorders',
 	{},// edit options
 	{},// add options
 	{},// del options
-	{multipleSearch:true, width:600}// search options
+	{multipleSearch:true, sopt:['eq','ne','lt','le','gt','ge','bw','bn','ew','en','cn','nc','in','ni'], width:600}// search options
 	);
 });
 
