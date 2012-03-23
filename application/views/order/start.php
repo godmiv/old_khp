@@ -1,7 +1,11 @@
 <script type="text/javascript">
 $(document).ready(function(){
-	//if($("#instrument :selected").val()=='1');
-	$("#instrument").hide();
+
+	if($("#osin :selected").val()=='1') {
+		$("#instrument").hide();
+	} else {
+		$("#instrument").show();
+	}
 	$("#osin").change(
 		function(){
 			if(this.value != '1'){
@@ -67,7 +71,16 @@ jQuery("#detal").jqGrid({
 
 jQuery("#detal").jqGrid('navGrid','#pager',
 	{edit:true,add:false,del:true}, //options
-	{width:650}, // edit options
+	{width:650,
+		afterSubmit:function(data_from_server, array_data) {
+			var result =data_from_server.responseText.split(';');
+			if (result[0] == 'fail') {
+				return [false,result[1]]
+			} else {
+				return [true,result[2]];
+			}
+		 }
+	}, // edit options
 	{}, // add options
 	{width:320}, // del options
 	{multipleSearch:true, sopt:['eq','ne','lt','le','gt','ge','bw','bn','ew','en','cn','nc','in','ni'], width:600} // search options
@@ -163,13 +176,9 @@ jQuery("#startedorders").jqGrid('navGrid','#pagerstartedorders',
 function createdialog(){
 	$("#dialog").dialog({
 		title: "Добавление детали",//тайтл, заголовок окна
-		width: 550,//ширина
+		width: 750,//ширина
 		height: 600,//высота
-		modal: false,//true -  окно модальное, false - нет
-		/*buttons: {
-			"Добавить текст в окно": function() { $("#dialog").text("опа! текст!"); },
-			"Закрыть": function() { $(this).dialog("close"); }
-		}*/
+		modal: true,//true - окно модальное, false - нет
 		autoOpen:false,
 		close: function(){$('#showform').value="false"}
 	});
@@ -239,49 +248,50 @@ function startorder(){
 <div id="dialog">
 <?php if (isset($errors)): ?>
 	<div class="ui-state-error ui-dialog-titlebar ui-corner-all ui-helper-clearfix">
-	Ошибка при заполнении полей, проверьте все поля.</div>
-	<?php foreach ($errors as $message): ?>
-	    <?php echo $message ?><br />
-	<?php endforeach ?>
+	Ошибка при заполнении полей.</div>
+	<br />
+<?php endif ?>
 
-	<?php endif ?>
 <?php
 echo form::open(NULL, array('id'=>'formadd'));
 ?>
-<?php
-foreach ($codifier_instr as $item){
-	$opt[$item['id']]= $item['name'].'    ('.$item['numstart'].')';
+<?php foreach ($codifier_instr as $item) {
+	$opt[$item['id']]= $item['name'].'     ('.$item['numstart'].')';
 }
-echo form::select('osin', $opt, '', array('id'=>'osin'));
+echo form::select('osin', $opt, $codifier_instr_selected, array('id'=>'osin'));
 ?>
 <table>
-	<?php
-	foreach ($form_osn as $field){
-		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::input($field['name'], $field['value'], $field['attr']).'</td></tr>';
-	}
-	?>
+	<?php foreach ($form_osn as $field):?>
+	<tr>
+		<td><?php echo $field['attr']['desc']?></td>
+		<td><?php echo form::input($field['name'], $field['value'], $field['attr'])?></td>
+		<td style="color:red"><?php if(isset ($errors[$field['name']])) echo $errors[$field['name']]; ?></td>
+	</tr>
+	<?php endforeach;?>
 </table>
 <div id="instrument">
 <table>
-	<?php
-	foreach ($form_ins as $field){
-		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::input($field['name'], $field['value'], $field['attr']).'</td></tr>';
-	}
-	?>
+	<?php foreach ($form_ins as $field):?>
+		<tr>
+			<td><?php echo $field['attr']['desc'];?></td>
+			<td><?php echo form::input($field['name'], $field['value'], $field['attr'])?></td>
+			<td style="color:red"><?php if(isset ($errors[$field['name']])) echo $errors[$field['name']]; ?></td>
+		</tr>
+	<?php endforeach;?>
 </table>
 </div>
 <table>
-	<?php
-	foreach ($form_all as $field){
-		echo '<tr><td>'.$field['attr']['desc'].'</td><td>'.form::textarea($field['name'], $field['value'], $field['attr']).'</td></tr>';
-	}
-	?>
+	<?php foreach ($form_all as $field):?>
+		<tr>
+			<td><?php echo $field['attr']['desc']?></td>
+			<td><?php echo form::textarea($field['name'], $field['value'], $field['attr'])?></td>
+			<td style="color:red"><?php if(isset ($errors[$field['name']])) echo $errors[$field['name']]; ?></td>
+		</tr>
+	<?php endforeach;?>
 </table>
 
-
-
 <table>
-	<?php echo '<tr><td>'.form::submit('add','Добавить деталь').'</td><td>'.'</td></tr>';?>
+	 <tr><td><?php echo form::submit('add','Добавить деталь')?></td><td></td></tr>
 </table>
 	<input type="hidden" name="showform" id="showform" value="" />
 	<?php echo form::close();?>

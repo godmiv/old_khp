@@ -18,7 +18,7 @@ return array(
 	'matches'       => ':field must be the same as :param2',
 	'min_length'    => ':field must be at least :param2 characters long',
 	'max_length'    => ':field must not exceed :param2 characters long',
-	'not_empty'     => ' не может быть пустым',
+	'not_empty'     => ' поле не может быть пустым',
 	'numeric'       => ':field must be numeric',
 	'phone'         => ':field must be a phone number',
 	'range'         => ':field must be within the range of :param2 to :param3',
