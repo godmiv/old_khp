@@ -42,23 +42,24 @@ class Controller_Order extends Controller_Template {
 		);		
 	}
 
-	public function action_start(){
+	public function action_start() {
 
 		$data['title'] = 'Открытие заказа';
 
 		$data['form_osn'] = array(
-			'detalavto'	=>array('name'=>'detalavto','value'=>'','attr'=>array('desc'=>'Деталь автомобиля', 'id'=>'detalavto')),
-			'nazvdet'	=>array('name'=>'nazvdet',	'value'=>'','attr'=>array('desc'=>'Название детали', 'id'=>'nazvdet')),
-			'nosnas'	=>array('name'=>'nosnas',	'value'=>'','attr'=>array('desc'=>'Шифр оснастки', 'id'=>'nosnas')),
-			'nizv'		=>array('name'=>'nizv',		'value'=>'','attr'=>array('desc'=>'Извещение оснастки', 'id'=>'nizv')),
+			'detalavto'	=>array('name'=>'detalavto','value'=>Arr::get($_POST, 'detalavto', ''),'attr'=>array('desc'=>'Деталь автомобиля', 'id'=>'detalavto')),
+			'nazvdet'	=>array('name'=>'nazvdet',	'value'=>Arr::get($_POST, 'nazvdet', ''),'attr'=>array('desc'=>'Название детали', 'id'=>'nazvdet')),
+			'nosnas'	=>array('name'=>'nosnas',	'value'=>Arr::get($_POST, 'nosnas', ''),'attr'=>array('desc'=>'Шифр оснастки', 'id'=>'nosnas')),
+			'nizv'		=>array('name'=>'nizv',		'value'=>Arr::get($_POST, 'nizv', ''),'attr'=>array('desc'=>'Извещение оснастки', 'id'=>'nizv')),
 		);
 
 		$data['form_ins'] = array(
-			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>'','attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr', 'readonly'=>'readonly')),
-			'nizvins'	=>array('name'=>'nizvins',	'value'=>'','attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
+			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>Arr::get($_POST, 'kodinstr', ''),'attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr', 'readonly'=>'readonly')),
+			'nizvins'	=>array('name'=>'nizvins',	'value'=>Arr::get($_POST, 'nizvins', ''),'attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
 		);
+		
 		$data['form_all'] = array(
-			'text'		=>array('name'=>'text', 'value'=>'', 'attr'=>array('desc'=>'Текст заказа', 'id'=>'text', 'cols'=>'30', 'rows'=>'5')),
+			'text'		=>array('name'=>'text', 'value'=>Arr::get($_POST, 'text', ''), 'attr'=>array('desc'=>'Текст заказа', 'id'=>'text', 'cols'=>'30', 'rows'=>'5')),
 		);
 
 		$data['columns']['detal'] = $this->columns['detal'];
@@ -77,17 +78,17 @@ class Controller_Order extends Controller_Template {
 
 		$query = DB::select()->from('codifier_instr');
 		$data['codifier_instr'] = $result = DB::query(Database::SELECT,$query)->execute()->as_array();
-
-		if(isset($_POST['add'])){
+		$data['codifier_instr_selected'] = Arr::get($_POST,'osin','');
+		if(isset($_POST['add'])) {
 			$post = Validation::factory($_POST);
-			if($_POST['osin'] == 1){
+			if($_POST['osin'] == 1) {
 				$post->rule('nosnas', 'not_empty');
 				$post->rule('nosnas', 'Model_Helper::validateNosnas');
 			} else {
 				$post->rule('kodinstr', 'not_empty');
 			}
 			$post->rule('nazvdet', 'not_empty');
-			if($post->check()){
+			if($post->check()) {
 				$query = DB::insert('orders', array(
 					'detalavto',
 					'nazvdet',
@@ -123,15 +124,15 @@ class Controller_Order extends Controller_Template {
 	 * Этот метод вызывается стандартными кнопками jqgrid
 	 * При нажатии кнопки jqgrid посылает $_POST['oper'] который может содержать del, edit или add
 	 */
-	public function action_edit(){
+	public function action_edit() {
 		$this->auto_render = false;
 
-		if($_POST['oper'] == 'del'){
+		if($_POST['oper'] == 'del') {
 			$query = DB::delete('orders')->where('id', '=', $_POST['id']);
 			$query->execute();
 		}
 
-		if($_POST['oper'] == 'edit'){
+		if($_POST['oper'] == 'edit') {
 			//print_r($_POST);
 			$id = Arr::get($_POST,'id');
 			$nosnas = Arr::get($_POST,'nosnas');
@@ -139,16 +140,19 @@ class Controller_Order extends Controller_Template {
 			$text = Arr::get($_POST, 'text');
 
 			$query = DB::select()->from('orders');
+		
 			$query->where_open()
 				->where_open()
-				->where('nosnas','=',$nosnas)
-				->and_where('kodinstr', '=', '')
+					->where('nosnas','=',$nosnas)
+					->and_where('kodinstr', '=', '')
 				->where_close()
-				->where_open()
-				->or_where('kodinstr', '=', $kodinstr)
+				->or_where_open()
+					->or_where('kodinstr', '=', $kodinstr)
 				->where_close()
 				->where_close()
-				->and_where('id', '<>', $id);
+				->and_where('id', '<>', $id)
+				->and_where('status','IS', NULL);// Если такая деталь уже присутствует в выданном заказе - то можно её запустить еще раз.
+			
 			$result = $query->execute()->as_array();
 			if(empty ($result)){
 				$query = DB::update('orders')
@@ -159,13 +163,18 @@ class Controller_Order extends Controller_Template {
 							))
 						->where('id', '=', $id);
 				$query->execute();
-				print_r($query);
+				$status = "success";
+				$message = "edit succeeded";
+			} else {
+				$status = "fail";
+				$message = "Ошибка. Такой шифр инструмента или оснастки уже есть в базе.";
 			}
+			$s = $status.';'.$message.';'.'';
 		}
-		$this->response->body($_POST['oper']);
+		$this->response->body($s);
 	}
 
-	public function action_detal(){
+	public function action_detal() {
 
 		$this->auto_render = false;
 
@@ -229,7 +238,7 @@ class Controller_Order extends Controller_Template {
 		$fields = array_keys($this->columns['detal']);
 		//print_r($fields);
 		// be sure to put text data in CDATA
-		foreach($result as $row){
+		foreach($result as $row) {
 			$s .= "<row id='". $row['id']."'>";
 			foreach($fields as $key=>$val) {
 				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
@@ -240,7 +249,7 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
-	public function action_orders(){
+	public function action_orders() {
 
 		$this->auto_render = false;
 		$page = $_POST['page'];
@@ -308,7 +317,7 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
-	public function action_started(){
+	public function action_started() {
 
 		$this->auto_render = false;
 		$page = $_POST['page'];
@@ -363,7 +372,7 @@ class Controller_Order extends Controller_Template {
 		$fields = array_keys($this->columns['startedorders']);
 
 		// be sure to put text data in CDATA
-		foreach($result as $row){
+		foreach($result as $row) {
 			$s .= "<row id='". $row['id']."'>";
 			foreach($fields as $key=>$val) {
 				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
@@ -374,9 +383,9 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
-	public function action_addtoorder(){
+	public function action_addtoorder() {
 		$this->auto_render = false;
-		if(!empty($_POST)){
+		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
 			$query = DB::select(array('max("number")', 'maxnum'))->from('orders');
 			$result = $query->execute()->as_array();
@@ -390,9 +399,9 @@ class Controller_Order extends Controller_Template {
 		}
  	}
 	
-	public function action_delfromorder(){
+	public function action_delfromorder() {
 		$this->auto_render = false;
-		if(!empty($_POST)){
+		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
 			$query = DB::update('orders')->set(array('number' => NULL))->where('id', 'IN', $ids);
 			$query->execute();
@@ -402,9 +411,9 @@ class Controller_Order extends Controller_Template {
 		}
 	}
 
-	public function action_startorder(){
+	public function action_startorder() {
 		$this->auto_render = false;
-		if(!empty($_POST)){
+		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
 			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
 			$id = $ids[0];
