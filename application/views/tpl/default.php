@@ -7,6 +7,7 @@
 		<?php echo HTML::style('assets/css/ui.jqgrid.css'), PHP_EOL ?>
 		
 		<?php echo HTML::style('assets/css/jsgantt.css'), PHP_EOL ?>
+		<?php echo HTML::style('assets/css/my.css'), PHP_EOL ?>
 		
 		<?php echo HTML::script('assets/js/jquery-1.7.1.min.js'), PHP_EOL ?>
 		<?php echo HTML::script('assets/js/grid.locale-ru.js'), PHP_EOL ?>
