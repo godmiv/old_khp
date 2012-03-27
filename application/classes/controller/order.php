@@ -36,12 +36,21 @@ class Controller_Order extends Controller_Template {
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
 			'text'=>array('Текст','150','textarea'),
-			'date_start'=>array('Дата выдачи заказа','120'),
+			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			//'date_end'=>array('Дата сдачи заказа','100')
 		);		
 	}
-
+	
+	public function action_index() {
+		$data['text'] = 'Index of order';
+		$this->template->content = View::factory('order/index',$data);
+	}
+	
+	/*
+	 * Выдача заказа технологами
+	 * 
+	 */
 	public function action_start() {
 
 		$data['title'] = 'Открытие заказа';
@@ -120,6 +129,7 @@ class Controller_Order extends Controller_Template {
 		}
 		$this->template->content = View::factory('order/start',$data);
 	}
+	
 	/*
 	 * Этот метод вызывается стандартными кнопками jqgrid
 	 * При нажатии кнопки jqgrid посылает $_POST['oper'] который может содержать del, edit или add
@@ -147,11 +157,12 @@ class Controller_Order extends Controller_Template {
 					->and_where('kodinstr', '=', '')
 				->where_close()
 				->or_where_open()
-					->or_where('kodinstr', '=', $kodinstr)
+					->where('kodinstr', '=', $kodinstr)
 				->where_close()
 				->where_close()
 				->and_where('id', '<>', $id)
-				->and_where('status','IS', NULL);// Если такая деталь уже присутствует в выданном заказе - то можно её запустить еще раз.
+				->and_where('status','IS', NULL);// Если деталь уже есть в невыданных заказах - не разрешаем добавление.
+												 // Если такая деталь уже присутствует в выданном заказе - то можно её запустить еще раз.
 			
 			$result = $query->execute()->as_array();
 			if(empty ($result)){
@@ -174,6 +185,10 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
+	/*
+	 * Вывод таблицы с деталями, которым не присвоен номер заказа.
+	 * Вызывается jqgrid'ом через ajax 
+	 */
 	public function action_detal() {
 
 		$this->auto_render = false;
@@ -249,6 +264,10 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
+	/*
+	 * Вывод таблицы с деталями, которым уже присвоен номер заказа.
+	 * Вызывается jqgrid'ом через ajax
+	 */
 	public function action_orders() {
 
 		$this->auto_render = false;
@@ -262,7 +281,7 @@ class Controller_Order extends Controller_Template {
 				->where('number', 'IS NOT', NULL)
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login'])
-				//->and_where('status', '<>', 'start')
+				//->and_where('status', '<>', 'Выдан')
 				;
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode($_POST['filters']));
@@ -317,6 +336,11 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
+	
+	/*
+	 * вывод таблицы с уже запущенными заказами
+	 * Вызывается jqgrid'ом через ajax
+	 */
 	public function action_started() {
 
 		$this->auto_render = false;
@@ -328,7 +352,7 @@ class Controller_Order extends Controller_Template {
 		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL)
-				->and_where('status', '=', 'start');
+				->and_where('status', '=', 'Выдан');
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode($_POST['filters']));
 		}
@@ -354,7 +378,7 @@ class Controller_Order extends Controller_Template {
 
 		$query = DB::select()->from('orders')
 				->where('number','IS NOT', NULL)
-				->and_where('status', '=', 'start')
+				->and_where('status', '=', 'Выдан')
 				->order_by($sidx,$sord)->limit($limit)->offset($start);
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode($_POST['filters']));
@@ -383,6 +407,10 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
+	/*
+	 * Добавление деталей в заказ
+	 * Вызывается через ajax
+	 */
 	public function action_addtoorder() {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
@@ -399,6 +427,10 @@ class Controller_Order extends Controller_Template {
 		}
  	}
 	
+	/*
+	 * Удаление деталей из заказа
+	 * Вызывается через ajax
+	 */
 	public function action_delfromorder() {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
@@ -411,6 +443,9 @@ class Controller_Order extends Controller_Template {
 		}
 	}
 
+	/*
+	 * Помечает заказ как запущенный, вызывается через ajax
+	 */
 	public function action_startorder() {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
@@ -421,7 +456,7 @@ class Controller_Order extends Controller_Template {
 			$number = $query->execute()->get('number');
 			//print_r($res->get('number'));
 			$query = DB::update('orders')
-					->set(array('date_start'=>DB::expr('now()'), 'status'=>'start'))
+					->set(array('date_start'=>DB::expr('now()'), 'status'=>'Выдан'))
 					->where('number','=',$number);
 			$query->execute();
 			return TRUE;
@@ -462,5 +497,18 @@ class Controller_Order extends Controller_Template {
 			}
 		}
 		$q->where_close();
+	}
+	
+	public function action_accept() {
+		
+		$data['title'] = 'Приемка заказа';
+		
+		$data['columns']['startedorders'] = $this->columns['startedorders'];
+		
+		foreach ($data['columns']['startedorders'] as $key=>$val){
+			$data['colnames']['startedorders'][] = $val[0];
+		}
+		
+		$this->template->content = View::factory('order/accept',$data);
 	}
 }
