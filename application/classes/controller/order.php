@@ -40,6 +40,21 @@ class Controller_Order extends Controller_Template {
 			'user_start'=>array('Выдал заказ','100'),
 			//'date_end'=>array('Дата сдачи заказа','100')
 		);		
+		$this->columns['acceptorders'] = array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','120'),
+			'nosnas'=>array('Шифр оснастки','180'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','200'),
+			'nizvins'=>array('Изв. истр.','100'),
+			'text'=>array('Текст','150','textarea'),
+			'date_start'=>array('Дата выдачи заказа','85'),
+			'user_start'=>array('Выдал заказ','100'),
+			//'date_end'=>array('Дата сдачи заказа','100')
+		);
 	}
 	
 	public function action_index() {
@@ -504,11 +519,142 @@ class Controller_Order extends Controller_Template {
 		$data['title'] = 'Приемка заказа';
 		
 		$data['columns']['startedorders'] = $this->columns['startedorders'];
-		
+
+		$data['columns']['acceptorders'] = $this->columns['acceptorders'];
+	
 		foreach ($data['columns']['startedorders'] as $key=>$val){
 			$data['colnames']['startedorders'][] = $val[0];
 		}
-		
+		foreach ($data['columns']['acceptorders'] as $key=>$val){
+			$data['colnames']['acceptorders'][] = $val[0];
+		}
 		$this->template->content = View::factory('order/accept',$data);
+	}
+	
+	/*
+	 * Помечает заказ как принятый, вызывается через ajax
+	 */
+	public function action_acceptorder() {
+		$this->auto_render = false;
+		//print_r($_POST);
+		if(!empty($_POST)) {
+			$ids = explode(',', $_POST['ids']);
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			$id = $ids[0];
+			$query = DB::select('number')->from('orders')->where('id','=',$id);
+			$number = $query->execute()->get('number');
+			//print_r($res->get('number'));
+			$query = DB::update('orders')
+					->set(array('date_accept'=>DB::expr('now()'), 'status'=>'Принят'))
+					->where('number','=',$number);
+			$query->execute();
+			// В одну из деталей заказ добавляем коментарий ко всему заказу.
+			$query = DB::update('orders')
+					->set(array('comment_accept'=>Arr::get($_POST,'comment')))
+					->where('id','=',$id);
+			$query->execute();
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	/*
+	 * Помечает заказ как непринятый, вызывается через ajax
+	 */
+	public function action_notacceptorder() {
+		$this->auto_render = false;
+		if(!empty($_POST)) {
+			$ids = explode(',', $_POST['ids']);
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			$id = $ids[0];
+			$query = DB::select('number')->from('orders')->where('id','=',$id);
+			$number = $query->execute()->get('number');
+			//print_r($res->get('number'));
+			$query = DB::update('orders')
+					->set(array('date_accept'=>DB::expr('now()'), 'status'=>'Возврат'))
+					->where('number','=',$number);
+			$query->execute();
+			// В одну из деталей заказ добавляем коментарий ко всему заказу.
+			$query = DB::update('orders')
+					->set(array('comment_accept'=>Arr::get($_POST,'comment')))
+					->where('id','=',$id);
+			$query->execute();
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	/*
+	 * вывод таблицы с принятыми
+	 * Вызывается jqgrid'ом через ajax
+	 */
+	public function action_tableaccepted() {
+
+		$this->auto_render = false;
+		$page = $_POST['page'];
+		$limit = $_POST['rows'];
+		$sidx = $_POST['sidx'];
+		$sord = $_POST['sord'];
+		if(!$sidx) $sidx =1;
+		// calculate the number of rows for the query. We need this for paging the result
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Принят')
+					->or_where('status', '=', 'Возврат')
+				->where_close();
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
+		$count = $query->execute()->count();
+
+		// calculate the total pages for the query
+		if( $count > 0 && $limit > 0) {
+			$total_pages = ceil($count/$limit);
+		} else {
+			$total_pages = 0;
+		}
+
+		// if for some reasons the requested page is greater than the total
+		// set the requested page to total page
+		if ($page > $total_pages) $page=$total_pages;
+
+		// calculate the starting position of the rows
+		$start = $limit*$page - $limit;
+
+		// if for some reasons start position is negative set it to 0
+		// typical case is that the user type 0 for the requested page
+		if($start <0) $start = 0;
+
+		$query = DB::select()->from('orders')
+				->where('number','IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Принят')
+					->or_where('status', '=', 'Возврат')
+				->where_close()				
+				->order_by($sidx,$sord)->limit($limit)->offset($start);
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
+		$result = $query->execute()->as_array();
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+
+		$s = "<?xml version='1.0' encoding='utf-8'?>";
+		$s .= "<rows>";
+		$s .= "<page>".$page."</page>";
+		$s .= "<total>".$total_pages."</total>";
+		$s .= "<records>".$count."</records>";
+
+		$fields = array_keys($this->columns['startedorders']);
+
+		// be sure to put text data in CDATA
+		foreach($result as $row) {
+			$s .= "<row id='". $row['id']."'>";
+			foreach($fields as $key=>$val) {
+				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
+			}
+			$s .= "</row>";
+		}
+		$s .= "</rows>";
+		$this->response->body($s);
 	}
 }
