@@ -519,8 +519,9 @@ class Controller_Order extends Controller_Template {
 		$data['title'] = 'Приемка заказа';
 		
 		$data['columns']['startedorders'] = $this->columns['startedorders'];
+
 		$data['columns']['acceptorders'] = $this->columns['acceptorders'];
-		
+	
 		foreach ($data['columns']['startedorders'] as $key=>$val){
 			$data['colnames']['startedorders'][] = $val[0];
 		}
@@ -656,5 +657,4 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
-	
 }
