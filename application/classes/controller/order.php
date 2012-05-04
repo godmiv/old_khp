@@ -5,9 +5,9 @@ class Controller_Order extends Controller_Template {
 	public $template = 'tpl/default';
 
 	public $user = array('login'=>'testuser','group'=>'testgroup');
-	
+
 	public $columns;
-	
+
 	public function before() {
 		parent::before();
 
@@ -39,7 +39,7 @@ class Controller_Order extends Controller_Template {
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			//'date_end'=>array('Дата сдачи заказа','100')
-		);		
+		);
 		$this->columns['acceptorders'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -56,15 +56,15 @@ class Controller_Order extends Controller_Template {
 			//'date_end'=>array('Дата сдачи заказа','100')
 		);
 	}
-	
+
 	public function action_index() {
 		$data['text'] = 'Index of order';
 		$this->template->content = View::factory('order/index',$data);
 	}
-	
+
 	/*
 	 * Выдача заказа технологами
-	 * 
+	 *
 	 */
 	public function action_start() {
 
@@ -81,7 +81,7 @@ class Controller_Order extends Controller_Template {
 			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>Arr::get($_POST, 'kodinstr', ''),'attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr', 'readonly'=>'readonly')),
 			'nizvins'	=>array('name'=>'nizvins',	'value'=>Arr::get($_POST, 'nizvins', ''),'attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
 		);
-		
+
 		$data['form_all'] = array(
 			'text'		=>array('name'=>'text', 'value'=>Arr::get($_POST, 'text', ''), 'attr'=>array('desc'=>'Текст заказа', 'id'=>'text', 'cols'=>'30', 'rows'=>'5')),
 		);
@@ -89,7 +89,7 @@ class Controller_Order extends Controller_Template {
 		$data['columns']['detal'] = $this->columns['detal'];
 		$data['columns']['orders'] = $this->columns['orders'];
 		$data['columns']['startedorders'] = $this->columns['startedorders'];
-		
+
 		foreach ($data['columns']['detal'] as $key=>$val){
 			$data['colnames']['detal'][] = $val[0];
 		}
@@ -142,9 +142,10 @@ class Controller_Order extends Controller_Template {
 				//$this->template->content = 'Ошибка добавления записи в базу.';
 			}
 		}
+		//echo var_dump($data);
 		$this->template->content = View::factory('order/start',$data);
 	}
-	
+
 	/*
 	 * Этот метод вызывается стандартными кнопками jqgrid
 	 * При нажатии кнопки jqgrid посылает $_POST['oper'] который может содержать del, edit или add
@@ -165,7 +166,7 @@ class Controller_Order extends Controller_Template {
 			$text = Arr::get($_POST, 'text');
 
 			$query = DB::select()->from('orders');
-		
+
 			$query->where_open()
 				->where_open()
 					->where('nosnas','=',$nosnas)
@@ -178,7 +179,7 @@ class Controller_Order extends Controller_Template {
 				->and_where('id', '<>', $id)
 				->and_where('status','IS', NULL);// Если деталь уже есть в невыданных заказах - не разрешаем добавление.
 												 // Если такая деталь уже присутствует в выданном заказе - то можно её запустить еще раз.
-			
+
 			$result = $query->execute()->as_array();
 			if(empty ($result)){
 				$query = DB::update('orders')
@@ -202,7 +203,7 @@ class Controller_Order extends Controller_Template {
 
 	/*
 	 * Вывод таблицы с деталями, которым не присвоен номер заказа.
-	 * Вызывается jqgrid'ом через ajax 
+	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_detal() {
 
@@ -218,7 +219,7 @@ class Controller_Order extends Controller_Template {
 				->where('number', 'IS', NULL)
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login']);
-		
+
 		// Добавляем условия для поиска
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode($_POST['filters']));
@@ -248,7 +249,7 @@ class Controller_Order extends Controller_Template {
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login'])
 				->order_by($sidx, $sord)->limit($limit)->offset($start);
-		
+
 		// Добавляем условия для поиска
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode($_POST['filters']));
@@ -351,7 +352,7 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
-	
+
 	/*
 	 * вывод таблицы с уже запущенными заказами
 	 * Вызывается jqgrid'ом через ajax
@@ -441,7 +442,7 @@ class Controller_Order extends Controller_Template {
 			echo 'Не выбрана ни одна деталь';
 		}
  	}
-	
+
 	/*
 	 * Удаление деталей из заказа
 	 * Вызывается через ajax
@@ -465,7 +466,7 @@ class Controller_Order extends Controller_Template {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
-			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
 			$id = $ids[0];
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
@@ -496,32 +497,32 @@ class Controller_Order extends Controller_Template {
 				case 'ne': $q->$w($rule->field, '<>', $rule->data); break; // не равно
 				case 'lt': $q->$w($rule->field, '<', $rule->data); break; // меньше
 				case 'le': $q->$w($rule->field, '<=', $rule->data); break; // меньше или равно
-				case 'gt': $q->$w($rule->field, '>', $rule->data); break; // больше	
+				case 'gt': $q->$w($rule->field, '>', $rule->data); break; // больше
 				case 'ge': $q->$w($rule->field, '>=', $rule->data); break; // больше или равно
 				case 'bw': $q->$w($rule->field, 'LIKE', $rule->data.'%'); break; // начинается с
 				case 'bn': $q->$w($rule->field, 'NOT LIKE', $rule->data.'%'); break; // не начинается с
 				case 'ew': $q->$w($rule->field, 'LIKE', '%'.$rule->data); break; // заканчивается на
-				case 'en': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data); break; // не заканчивается на 
+				case 'en': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data); break; // не заканчивается на
 				case 'cn': $q->$w($rule->field, 'LIKE', '%'.$rule->data.'%'); break; // содержит
 				case 'nс': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data.'%'); break; // не содержит
 				case 'nu': $q->$w($rule->field, 'IS', NULL); break; // is null
 				case 'nn': $q->$w($rule->field, 'IS NOT', NULL); break; // is not null
 				case 'in': $q->$w($rule->field, 'IN', explode(',', $rule->data)); break; // находится в
 				case 'ni': $q->$w($rule->field, 'NOT IN', explode(',', $rule->data)); break; // не находится в
-				//default: 
+				//default:
 			}
 		}
 		$q->where_close();
 	}
-	
+
 	public function action_accept() {
-		
+
 		$data['title'] = 'Приемка заказа';
-		
+
 		$data['columns']['startedorders'] = $this->columns['startedorders'];
 
 		$data['columns']['acceptorders'] = $this->columns['acceptorders'];
-	
+
 		foreach ($data['columns']['startedorders'] as $key=>$val){
 			$data['colnames']['startedorders'][] = $val[0];
 		}
@@ -530,7 +531,7 @@ class Controller_Order extends Controller_Template {
 		}
 		$this->template->content = View::factory('order/accept',$data);
 	}
-	
+
 	/*
 	 * Помечает заказ как принятый, вызывается через ajax
 	 */
@@ -539,7 +540,7 @@ class Controller_Order extends Controller_Template {
 		//print_r($_POST);
 		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
-			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
 			$id = $ids[0];
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
@@ -564,7 +565,7 @@ class Controller_Order extends Controller_Template {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
-			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
 			$id = $ids[0];
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
@@ -629,7 +630,7 @@ class Controller_Order extends Controller_Template {
 				->and_where_open()
 					->where('status', '=', 'Принят')
 					->or_where('status', '=', 'Возврат')
-				->where_close()				
+				->where_close()
 				->order_by($sidx,$sord)->limit($limit)->offset($start);
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode($_POST['filters']));
