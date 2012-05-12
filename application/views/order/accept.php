@@ -63,7 +63,7 @@ jQuery("#acceptorders").jqGrid({
    	sortname: 'number',
     viewrecords: true,
     sortorder: "desc",
-    caption: "Выданные заказы",
+    caption: "Принятые заказы",
 	//autowidth: true,
 	height: "100%",
 	//editurl: "../order/edit",
@@ -119,10 +119,24 @@ function notacceptorder(){
 </script>
 <h3>Приемка заказов</h3>
 <?php echo Form::open('order/accept');?>
-<?php echo Form::button('accept','Принять заказ',array('id'=>'btn_accept','onclick'=>'acceptorder()'));?> 
-<?php echo Form::button('notaccept','Вернуть заказ',array('id'=>'btn_notaccept','onclick'=>'notacceptorder()'));?>
- Коментарий (к принимаемому или возвращаемому заказу) <?php echo Form::input('comment', '', array('id'=>'comment','size'=>'70','maxlength'=>'100'));?> 
-<?php echo Form::button('clear','Очистить коментарий',array('onclick'=>'$("#comment").val("")'));?> 
+<table>
+	<tr>
+		<td>
+			<?php echo Form::button('accept','Принять заказ',array('id'=>'btn_accept','onclick'=>'acceptorder()'));?>
+			<?php echo Form::button('notaccept','Вернуть заказ',array('id'=>'btn_notaccept','onclick'=>'notacceptorder()'));?>
+		</td>
+		<td>Коментарий (к принимаемому или возвращаемому заказу)</td>
+		<td><?php echo Form::input('comment', '', array('id'=>'comment','size'=>'70','maxlength'=>'100'));?></td>
+		<td><?php echo Form::button('clear','Очистить коментарий',array('onclick'=>'$("#comment").val("")'));?></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td>№ Служебной</td>
+		<td><?php echo Form::input('document', '', array('id'=>'document','size'=>'70','maxlength'=>'100'));?></td>
+		<td><?php echo Form::button('clear','Очистить № Служебной',array('onclick'=>'$("#document").val("")'));?></td>
+		</td>
+	</tr>
+</table>
  <?php echo Form::close()?>
 <table id="startedorders"></table>
 <div id="pagerstartedorders"></div>

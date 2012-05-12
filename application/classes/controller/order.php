@@ -23,7 +23,7 @@ class Controller_Order extends Controller_Template {
 			'nizvins'=>array('Изв. истр.','100'),
 			//'date_start'=>array('Дата выдачи заказа','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
-			'text'=>array('Текст','250','textarea'),
+			'text'=>array('Коментарий технолога','250','textarea'),
 		);
 		$this->columns['startedorders'] = array(
 			'id'=>array('ID','30'),
@@ -35,10 +35,12 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Текст','150','textarea'),
+			'text'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
-			//'date_end'=>array('Дата сдачи заказа','100')
+			//'date_end'=>array('Дата сдачи заказа','100'),
+			
 		);
 		$this->columns['acceptorders'] = array(
 			'id'=>array('ID','30'),
@@ -50,10 +52,11 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Текст','150','textarea'),
+			'text'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
-			//'date_end'=>array('Дата сдачи заказа','100')
+			//'date_end'=>array('Дата сдачи заказа','100'),
 		);
 	}
 
@@ -658,4 +661,21 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
+	public function action_plan() {
+
+		$data['title'] = 'Планирование заказа';
+
+		$data['columns']['startedorders'] = $this->columns['startedorders'];
+
+		$data['columns']['acceptorders'] = $this->columns['acceptorders'];
+
+		foreach ($data['columns']['startedorders'] as $key=>$val){
+			$data['colnames']['startedorders'][] = $val[0];
+		}
+		foreach ($data['columns']['acceptorders'] as $key=>$val){
+			$data['colnames']['acceptorders'][] = $val[0];
+		}
+		$this->template->content = View::factory('order/plan',$data);
+	}
+	
 }
