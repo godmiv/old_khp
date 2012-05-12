@@ -113,6 +113,7 @@ CREATE TABLE `orders` (
   KEY `number` (`number`)
 ) ENGINE=MyISAM AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
 
+
 --
 -- Dumping data for table `orders`
 --
