@@ -25,6 +25,7 @@ class Controller_Order extends Controller_Template {
 			//'date_end'=>array('Дата сдачи заказа','100'),
 			'text'=>array('Коментарий технолога','250','textarea'),
 		);
+		
 		$this->columns['startedorders'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -40,8 +41,8 @@ class Controller_Order extends Controller_Template {
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
-			
 		);
+
 		$this->columns['acceptorders'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -56,6 +57,24 @@ class Controller_Order extends Controller_Template {
 			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
+			//'date_end'=>array('Дата сдачи заказа','100'),
+		);
+		
+		$this->columns['plan'] = array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','120'),
+			'nosnas'=>array('Шифр оснастки','180'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','200'),
+			'nizvins'=>array('Изв. истр.','100'),
+			'text'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
+			'date_start'=>array('Дата выдачи заказа','85'),
+			'user_start'=>array('Выдал заказ','100'),
+			'doer'=>array('Исполнитель','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
 		);
 	}
@@ -661,21 +680,125 @@ class Controller_Order extends Controller_Template {
 		$s .= "</rows>";
 		$this->response->body($s);
 	}
+	/*
+	 * Вывод таблицы планирования
+	 */
 	public function action_plan() {
-
 		$data['title'] = 'Планирование заказа';
-
-		$data['columns']['startedorders'] = $this->columns['startedorders'];
-
-		$data['columns']['acceptorders'] = $this->columns['acceptorders'];
-
-		foreach ($data['columns']['startedorders'] as $key=>$val){
-			$data['colnames']['startedorders'][] = $val[0];
+		$doers = '';
+		$query = DB::select()->from('users')
+				->where('group', '=', 'kbimo');
+		$result = $query->execute()->as_array();
+		foreach ($result as $key=>$val){
+			$doers .= $val['login'].':'.$val['f'].';';
 		}
-		foreach ($data['columns']['acceptorders'] as $key=>$val){
-			$data['colnames']['acceptorders'][] = $val[0];
+		$doers = substr($doers,0,-1);
+		
+		$data['columns']['plan'] = $this->columns['plan'];
+		$data['columns']['plan']['doer']['values'] = $doers;
+		foreach ($data['columns']['plan'] as $key=>$val){
+			$data['colnames']['plan'][] = $val[0];
 		}
 		$this->template->content = View::factory('order/plan',$data);
 	}
-	
+
+	/*
+	 * Помечает заказ как запланированный, вызывается jqgrid'ом через аякс.
+	 */
+	public function action_saveplan() {
+		$this->auto_render = false;
+		if(!empty($_POST)) {
+			$id = Arr::get($_POST,'id');
+			$doer_login = Arr::get($_POST,'doer');
+			$query = DB::select('f')->from('users')->where('login','=',$doer_login);
+			$doer_f = $query->execute()->get('f');
+			
+			$query = DB::select('number')->from('orders')->where('id','=',$id);
+			$number = $query->execute()->get('number');
+			
+			$query = DB::update('orders')
+					->set(array('date_plan'=>DB::expr('now()'), 'status'=>'План', 'doer'=>$doer_f))
+					->where('number','=',$number);
+			$query->execute();
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	/*
+	 * Вызывается jqgrid'ом для отрисовки таблицы заказов для планирования.
+	 */
+	public function action_tableplan() {
+		$this->auto_render = false;
+		$page = $_POST['page'];
+		$limit = $_POST['rows'];
+		$sidx = $_POST['sidx'];
+		$sord = $_POST['sord'];
+		if(!$sidx) $sidx =1;
+		// calculate the number of rows for the query. We need this for paging the result
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Принят')
+					->or_where('status', '=', 'План')
+				->where_close();
+				//->group_by('number');
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
+		$count = $query->execute()->count();
+
+		// calculate the total pages for the query
+		if( $count > 0 && $limit > 0) {
+			$total_pages = ceil($count/$limit);
+		} else {
+			$total_pages = 0;
+		}
+
+		// if for some reasons the requested page is greater than the total
+		// set the requested page to total page
+		if ($page > $total_pages) $page=$total_pages;
+
+		// calculate the starting position of the rows
+		$start = $limit*$page - $limit;
+
+		// if for some reasons start position is negative set it to 0
+		// typical case is that the user type 0 for the requested page
+		if($start <0) $start = 0;
+
+		$query = DB::select()->from('orders')
+				->where('number','IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Принят')
+					->or_where('status', '=', 'План')
+				->where_close()
+				//->group_by('number')
+				->order_by($sidx,$sord)->limit($limit)->offset($start);
+		if($_POST['_search'] == 'true') {
+			$this->createwhere($query,json_decode($_POST['filters']));
+		}
+		//echo Database::instance()->last_query;
+		$result = $query->execute()->as_array();
+		//print_r($result);
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+
+		$s = "<?xml version='1.0' encoding='utf-8'?>";
+		$s .= "<rows>";
+		$s .= "<page>".$page."</page>";
+		$s .= "<total>".$total_pages."</total>";
+		$s .= "<records>".$count."</records>";
+
+		$fields = array_keys($this->columns['plan']);
+
+		// be sure to put text data in CDATA
+		foreach($result as $row) {
+			$s .= "<row id='". $row['id']."'>";
+			foreach($fields as $key=>$val) {
+				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
+			}
+			$s .= "</row>";
+		}
+		$s .= "</rows>";
+		$this->response->body($s);
+	}
 }

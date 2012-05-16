@@ -1,38 +1,42 @@
 <script type="text/javascript">
 $(function(){
-jQuery("#acceptorders").jqGrid({
-    url:'<?php echo URL::base()?>order/tableaccepted',
+var lastsel;
+jQuery("#plan").jqGrid({
+    url:'<?php echo URL::base()?>order/tableplan',
     datatype: 'xml',
     mtype: 'POST',
-   	colNames:["<?php echo implode('","',$colnames['acceptorders']);?>"],
+   	colNames:["<?php echo implode('","',$colnames['plan']);?>"],
    	colModel:[
-		<?php foreach($columns['acceptorders'] as $key=>$col):?>
-		{name:'<?=$key;?>',
-			index:'<?=$key;?>',
-			width:<?=$col[1];?>,
-			editable:<?php
-			if($key != 'id') echo 'true';
-			else echo 'false'
-			?>},
+		<?php foreach($columns['plan'] as $key=>$col):?>
+		{name:'<?=$key;?>',index:'<?=$key;?>',width:<?=$col[1];?>,editable:<?php if($key == 'doer') echo 'true';else echo 'false';if($key == 'doer'):?>,edittype:"select",editoptions:{value:"<?=$col['values'];?>"}<?php endif;?>},
 		<?php endforeach;?>
    	],
    	rowNum:20,
    	rowList:[5,10,20,30],
-   	pager: '#pageracceptdorders',
+   	pager: '#pagerplan',
    	sortname: 'number',
     viewrecords: true,
     sortorder: "desc",
     caption: "Выданные заказы",
 	//autowidth: true,
 	height: "100%",
-	//editurl: "../order/edit",
-	multiselect: true,
+	editurl: "<?php echo URL::base()?>order/saveplan",
+	multiselect: false,
 	gridComplete: function() {
-
+	},
+	onSelectRow: function(id){
+		//alert(id)
+		if(id && id!==lastsel){
+			jQuery('#plan').restoreRow(lastsel);
+			jQuery('#plan').editRow(id,true,null,refreshGrid);
+			lastsel=id;
+		}
 	}
 });
-
-jQuery("#acceptorders").jqGrid('navGrid','#pageracceptdorders',
+function refreshGrid(){
+	$('#plan').trigger('reloadGrid');
+}
+jQuery("#plan").jqGrid('navGrid','#pagerplan',
 	{edit:false,add:false,del:false}, //options
 	{},// edit options
 	{},// add options
@@ -41,42 +45,9 @@ jQuery("#acceptorders").jqGrid('navGrid','#pageracceptdorders',
 	);
 });
 
-function acceptorder(){
-	s = jQuery("#startedorders").jqGrid('getGridParam','selarrrow');
-	if(s != ''){
-		$.ajax({
-			url: "<?php echo URL::base()?>order/acceptorder/",
-			data: 'ids='+s+'&comment='+$("#comment").val(),
-			type: 'POST',
-			cache: false,
-			success: function(data){
-				//$('#detal').trigger("reloadGrid");
-				$('#startedorders').trigger("reloadGrid");
-				$('#acceptorders').trigger('reloadGrid');
-				//alert( "data: " + data );
-			}
-		});
-	}
-}
-function notacceptorder(){
-	s = jQuery("#startedorders").jqGrid('getGridParam','selarrrow');
-	if(s != ''){
-		$.ajax({
-			url: "<?php echo URL::base()?>order/notacceptorder/",
-			data: 'ids='+s+'&comment='+$("#comment").val(),
-			type: 'POST',
-			cache: false,
-			success: function(data){
-				//$('#detal').trigger("reloadGrid");
-				$('#startedorders').trigger("reloadGrid");
-				$('#acceptorders').trigger('reloadGrid');
-				//alert( "data: " + data );
-			}
-		});
-	}
-}
+
 </script>
 <h3>Планирование</h3>
  <?php echo Form::close()?>
-<table id="acceptorders"></table>
-<div id="pageracceptdorders"></div>
+<table id="plan"></table>
+<div id="pagerplan"></div>
