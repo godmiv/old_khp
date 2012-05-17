@@ -1,6 +1,5 @@
 <script type="text/javascript">
 $(function(){
-
 jQuery("#finish").jqGrid({
     url:'<?php echo URL::base()?>order/tablefinish',
     datatype: 'xml',
