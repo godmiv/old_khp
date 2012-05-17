@@ -48,6 +48,5 @@ jQuery("#plan").jqGrid('navGrid','#pagerplan',
 
 </script>
 <h3>Планирование</h3>
- <?php echo Form::close()?>
 <table id="plan"></table>
 <div id="pagerplan"></div>

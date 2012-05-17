@@ -23,7 +23,7 @@ class Controller_Order extends Controller_Template {
 			'nizvins'=>array('Изв. истр.','100'),
 			//'date_start'=>array('Дата выдачи заказа','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
-			'text'=>array('Коментарий технолога','250','textarea'),
+			'comment_start'=>array('Коментарий технолога','200','textarea'),//'text'=>array('Коментарий технолога','250','textarea'),
 		);
 		
 		$this->columns['startedorders'] = array(
@@ -36,8 +36,8 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Коментарий технолога','150','textarea'),
-			'comment_accept'=>array('Коментарий конструктора','150'),
+			'comment_start'=>array('Коментарий технолога','200','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','200'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
@@ -53,8 +53,8 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Коментарий технолога','150','textarea'),
-			'comment_accept'=>array('Коментарий конструктора','150'),
+			'comment_start'=>array('Коментарий технолога','200','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','200'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
@@ -70,8 +70,26 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Коментарий технолога','150','textarea'),
-			'comment_accept'=>array('Коментарий конструктора','150'),
+			'comment_start'=>array('Коментарий технолога','200','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','200'),
+			'date_start'=>array('Дата выдачи заказа','85'),
+			'user_start'=>array('Выдал заказ','100'),
+			'doer'=>array('Исполнитель','100'),
+			//'date_end'=>array('Дата сдачи заказа','100'),
+		);
+		
+		$this->columns['finish'] = array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','120'),
+			'nosnas'=>array('Шифр оснастки','180'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','200'),
+			'nizvins'=>array('Изв. истр.','100'),
+			'comment_start'=>array('Коментарий технолога','200','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','200'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			'doer'=>array('Исполнитель','100'),
@@ -105,7 +123,7 @@ class Controller_Order extends Controller_Template {
 		);
 
 		$data['form_all'] = array(
-			'text'		=>array('name'=>'text', 'value'=>Arr::get($_POST, 'text', ''), 'attr'=>array('desc'=>'Текст заказа', 'id'=>'text', 'cols'=>'30', 'rows'=>'5')),
+			'comment_start'	=>array('name'=>'comment_start', 'value'=>Arr::get($_POST, 'comment_start', ''), 'attr'=>array('desc'=>'Текст заказа', 'id'=>'comment_start', 'cols'=>'30', 'rows'=>'5')),
 		);
 
 		$data['columns']['detal'] = $this->columns['detal'];
@@ -142,7 +160,7 @@ class Controller_Order extends Controller_Template {
 					'nizv',
 					'kodinstr',
 					'nizvins',
-					'text',
+					'comment_start',
 					'user_start',
 					'group_start'
 					))
@@ -153,7 +171,7 @@ class Controller_Order extends Controller_Template {
 							Arr::get($_POST, 'nizv'),
 							Arr::get($_POST, 'kodinstr'),
 							Arr::get($_POST, 'nizvins'),
-							Arr::get($_POST, 'text'),
+							Arr::get($_POST, 'comment_start'),
 							$this->user['login'],
 							$this->user['group']
 							));
@@ -208,7 +226,7 @@ class Controller_Order extends Controller_Template {
 						->set(array('kodinstr' => Arr::get($_POST,'kodinstr'),
 									'nosnas' => Arr::get($_POST,'nosnas'),
 									'nazvdet' => Arr::get($_POST,'nazvdet'),
-									'text' => Arr::get($_POST,'text'),
+									'comment_start' => Arr::get($_POST,'comment_start'),
 							))
 						->where('id', '=', $id);
 				$query->execute();
@@ -228,223 +246,45 @@ class Controller_Order extends Controller_Template {
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_detal() {
-
 		$this->auto_render = false;
-
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS', NULL)
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login']);
-
-		// Добавляем условия для поиска
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-
-		$count = DB::query(Database::SELECT,$query)->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-		$query = DB::select()->from('orders')
-				->where('number','IS',NULL)
-				->and_where('status', 'IS', NULL)
-				->and_where('user_start', '=', $this->user['login'])
-				->order_by($sidx, $sord)->limit($limit)->offset($start);
-
-		// Добавляем условия для поиска
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		//echo $query;
-		$result =$query->execute()->as_array();
-
-		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['detal']);
-		//print_r($fields);
-		// be sure to put text data in CDATA
-		foreach($result as $row) {
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
-
 	/*
 	 * Вывод таблицы с деталями, которым уже присвоен номер заказа.
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_orders() {
-
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
-		$query = DB::select()->from('orders')
-				->where('number', 'IS NOT', NULL)
-				->and_where('status', 'IS', NULL)
-				->and_where('user_start', '=', $this->user['login'])
-				//->and_where('status', '<>', 'Выдан')
-				;
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$count = $query->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-
 		$query = DB::select()->from('orders')
 				->where('number','IS NOT', NULL)
 				->and_where('user_start', '=', $this->user['login'])
-				->and_where('status', 'IS', NULL)
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$result = $query->execute()->as_array();
-		// we should set the appropriate header information. Do not forget this.
+				->and_where('status', 'IS', NULL);
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['orders']);
-		// be sure to put text data in CDATA
-		foreach($result as $row){
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
-
 	/*
 	 * вывод таблицы с уже запущенными заказами
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_started() {
-
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
-		$query = DB::select()->from('orders')
-				->where('number', 'IS NOT', NULL)
-				->and_where('status', '=', 'Выдан');
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$count = $query->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-
 		$query = DB::select()->from('orders')
 				->where('number','IS NOT', NULL)
-				->and_where('status', '=', 'Выдан')
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$result = $query->execute()->as_array();
-		// we should set the appropriate header information. Do not forget this.
+				->and_where('status', '=', 'Выдан');
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['startedorders']);
-
-		// be sure to put text data in CDATA
-		foreach($result as $row) {
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
-
 	/*
 	 * Добавление деталей в заказ
 	 * Вызывается через ajax
@@ -464,7 +304,6 @@ class Controller_Order extends Controller_Template {
 			echo 'Не выбрана ни одна деталь';
 		}
  	}
-
 	/*
 	 * Удаление деталей из заказа
 	 * Вызывается через ajax
@@ -480,7 +319,6 @@ class Controller_Order extends Controller_Template {
 			echo 'Не выбрана ни одна деталь';
 		}
 	}
-
 	/*
 	 * Помечает заказ как запущенный, вызывается через ajax
 	 */
@@ -501,7 +339,6 @@ class Controller_Order extends Controller_Template {
 		}
 		else return FALSE;
 	}
-
 	/*
 	 * Добавляет условия для поиска в запрос.
 	 * @param $q Запрос, в который добавляются условия
@@ -610,74 +447,17 @@ class Controller_Order extends Controller_Template {
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_tableaccepted() {
-
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL)
 				->and_where_open()
 					->where('status', '=', 'Принят')
 					->or_where('status', '=', 'Возврат')
 				->where_close();
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$count = $query->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-
-		$query = DB::select()->from('orders')
-				->where('number','IS NOT', NULL)
-				->and_where_open()
-					->where('status', '=', 'Принят')
-					->or_where('status', '=', 'Возврат')
-				->where_close()
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$result = $query->execute()->as_array();
 		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['startedorders']);
-
-		// be sure to put text data in CDATA
-		foreach($result as $row) {
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
 	/*
@@ -729,21 +509,103 @@ class Controller_Order extends Controller_Template {
 	 */
 	public function action_tableplan() {
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
-				->where('number', 'IS NOT', NULL)
+				->where('number','IS NOT', NULL)
 				->and_where_open()
 					->where('status', '=', 'Принят')
 					->or_where('status', '=', 'План')
 				->where_close();
-				//->group_by('number');
+				//->group_by('number')
+		$fields = array_keys($this->columns['plan']);
+		$s = $this->xmlforjqgrid($query,$fields);
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$this->response->body($s);
+	}
+
+	/*
+	 * Вывод таблицы завершения заказа
+	 */
+	public function action_finish() {
+		$data['title'] = 'Заершение заказа';
+
+		$data['columns']['finish'] = $this->columns['finish'];
+		$data['columns']['finished'] = $this->columns['finish'];
+		foreach ($data['columns']['finish'] as $key=>$val){
+			$data['colnames']['finish'][] = $val[0];
+			$data['colnames']['finished'][] = $val[0];
+		}
+		$this->template->content = View::factory('order/finish',$data);
+	}
+	/*
+	 * Помечает заказ как готовый, вызывается через ajax
+	 */
+	public function action_finishorder() {
+		$this->auto_render = false;
+		//print_r($_POST);
+		if(!empty($_POST)) {
+			$ids = explode(',', $_POST['ids']);
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
+			$id = $ids[0];
+			$query = DB::select('number')->from('orders')->where('id','=',$id);
+			$number = $query->execute()->get('number');
+			//print_r($res->get('number'));
+			$query = DB::update('orders')
+					->set(array('date_finish'=>DB::expr('now()'), 'status'=>'Готов'))
+					->where('number','=',$number);
+			$query->execute();
+			// В одну из деталей заказ добавляем коментарий ко всему заказу.
+			$query = DB::update('orders')
+					->set(array('comment_finish'=>Arr::get($_POST,'comment_finish')))
+					->where('id','=',$id);
+			$query->execute();
+			return TRUE;
+		}
+		else return FALSE;
+	}	
+	/*
+	 * Вызывается jqgrid'ом для отрисовки таблицы заказов находящихся в работе.
+	 */
+	public function action_tablefinish() {
+		$this->auto_render = false;
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'План')
+				->where_close();
+
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$fields = array_keys($this->columns['finish']);
+		$s = $this->xmlforjqgrid($query,$fields);
+		$this->response->body($s);
+	}
+	/*
+	 * Вызывается jqgrid'ом для отрисовки таблицы готовых заказов.
+	 */
+	public function action_tablefinished() {
+		$this->auto_render = false;
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Готов')
+				->where_close();
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$fields = array_keys($this->columns['finish']);
+		$s = $this->xmlforjqgrid($query,$fields);
+		$this->response->body($s);
+	}
+
+	private function xmlforjqgrid($query,$fields) {
+		$page = Arr::get($_POST,'page');
+		$limit = Arr::get($_POST,'rows');
+		$sidx = Arr::get($_POST,'sidx');
+		$sord = Arr::get($_POST,'sord');
+		
+		if(!$sidx) $sidx =1;
+		
+		// calculate the number of rows for the query. We need this for paging the result
 		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
+			$this->createwhere($query,json_decode(Arr::get($_POST,'filters')));
 		}
 		$count = $query->execute()->count();
 
@@ -764,31 +626,17 @@ class Controller_Order extends Controller_Template {
 		// if for some reasons start position is negative set it to 0
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
+		
+		// дополняем запрос условия сортировки и лимитами
+		$query->order_by($sidx,$sord)->limit($limit)->offset($start);
 
-		$query = DB::select()->from('orders')
-				->where('number','IS NOT', NULL)
-				->and_where_open()
-					->where('status', '=', 'Принят')
-					->or_where('status', '=', 'План')
-				->where_close()
-				//->group_by('number')
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		//echo Database::instance()->last_query;
 		$result = $query->execute()->as_array();
-		//print_r($result);
-		// we should set the appropriate header information. Do not forget this.
-		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
+		
 		$s = "<?xml version='1.0' encoding='utf-8'?>";
 		$s .= "<rows>";
 		$s .= "<page>".$page."</page>";
 		$s .= "<total>".$total_pages."</total>";
 		$s .= "<records>".$count."</records>";
-
-		$fields = array_keys($this->columns['plan']);
 
 		// be sure to put text data in CDATA
 		foreach($result as $row) {
@@ -799,6 +647,6 @@ class Controller_Order extends Controller_Template {
 			$s .= "</row>";
 		}
 		$s .= "</rows>";
-		$this->response->body($s);
-	}
+		return $s;
+	}	
 }

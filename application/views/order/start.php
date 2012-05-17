@@ -44,7 +44,7 @@ jQuery("#detal").jqGrid({
 			echo "{name:'$key',";
 			echo "index:'$key',";
 			echo "width:'$col[1]',";
-			if ($key == 'text'){
+			if ($key == 'comment_start'){
 				echo "edittype:'textarea',";
 				echo "editoptions: {rows:'5',cols:'50'},";
 			}
