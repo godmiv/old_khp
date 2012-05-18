@@ -17,7 +17,6 @@ jQuery("#startedorders").jqGrid({
 		<?php endforeach;?>
    	],
    	rowNum:20,
-
    	rowNum:5,
    	rowList:[5,10,20,30],
    	pager: '#pagerstartedorders',
