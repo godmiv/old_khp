@@ -18,6 +18,14 @@
 
     </head>
     <body>
+		<table style="background-color:lightgray">
+			<tr>
+				<td><?php echo Html::anchor('order/start','Выдача нового заказа');?></td>
+				<td><?php echo Html::anchor('order/accept','Приемка заказа');?></td>
+				<td><?php echo Html::anchor('order/plan','Планирование заказа');?></td>
+				<td><?php echo Html::anchor('order/finish','Завершение заказа');?></td>
+			</tr>
+		</table>
 		<?=$content?>
     </body>
 </html>

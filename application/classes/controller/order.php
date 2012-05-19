@@ -5,9 +5,9 @@ class Controller_Order extends Controller_Template {
 	public $template = 'tpl/default';
 
 	public $user = array('login'=>'testuser','group'=>'testgroup');
-	
+
 	public $columns;
-	
+
 	public function before() {
 		parent::before();
 
@@ -23,8 +23,9 @@ class Controller_Order extends Controller_Template {
 			'nizvins'=>array('Изв. истр.','100'),
 			//'date_start'=>array('Дата выдачи заказа','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
-			'text'=>array('Текст','250','textarea'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),//'text'=>array('Коментарий технолога','250','textarea'),
 		);
+
 		$this->columns['startedorders'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -35,11 +36,13 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Текст','150','textarea'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
-			//'date_end'=>array('Дата сдачи заказа','100')
-		);		
+			//'date_end'=>array('Дата сдачи заказа','100'),
+		);
+
 		$this->columns['acceptorders'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -50,21 +53,58 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'text'=>array('Текст','150','textarea'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
-			//'date_end'=>array('Дата сдачи заказа','100')
+			//'date_end'=>array('Дата сдачи заказа','100'),
+		);
+
+		$this->columns['plan'] = array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','120'),
+			'nosnas'=>array('Шифр оснастки','180'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','200'),
+			'nizvins'=>array('Изв. истр.','100'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
+			'date_start'=>array('Дата выдачи заказа','85'),
+			'user_start'=>array('Выдал заказ','100'),
+			'doer'=>array('Исполнитель','100'),
+			//'date_end'=>array('Дата сдачи заказа','100'),
+		);
+
+		$this->columns['finish'] = array(
+			'id'=>array('ID','30'),
+			'number'=>array('№ заказа','70'),
+			'status'=>array('Статус','70'),
+			'detalavto'=>array('Деталь автомобиля','150'),
+			'nazvdet'=>array('Название детали','120'),
+			'nosnas'=>array('Шифр оснастки','180'),
+			'nizv'=>array('Изв. оснастки','100'),
+			'kodinstr'=>array('Шифр инструмента','200'),
+			'nizvins'=>array('Изв. истр.','100'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
+			'date_start'=>array('Дата выдачи заказа','85'),
+			'user_start'=>array('Выдал заказ','100'),
+			'doer'=>array('Исполнитель','100'),
+			//'date_end'=>array('Дата сдачи заказа','100'),
 		);
 	}
-	
+
 	public function action_index() {
 		$data['text'] = 'Index of order';
 		$this->template->content = View::factory('order/index',$data);
 	}
-	
+
 	/*
 	 * Выдача заказа технологами
-	 * 
+	 *
 	 */
 	public function action_start() {
 
@@ -81,15 +121,15 @@ class Controller_Order extends Controller_Template {
 			'kodinstr'	=>array('name'=>'kodinstr',	'value'=>Arr::get($_POST, 'kodinstr', ''),'attr'=>array('desc'=>'Код инструмента', 'id'=>'kodinstr', 'readonly'=>'readonly')),
 			'nizvins'	=>array('name'=>'nizvins',	'value'=>Arr::get($_POST, 'nizvins', ''),'attr'=>array('desc'=>'Извещение инструмента', 'id'=>'nizvins')),
 		);
-		
+
 		$data['form_all'] = array(
-			'text'		=>array('name'=>'text', 'value'=>Arr::get($_POST, 'text', ''), 'attr'=>array('desc'=>'Текст заказа', 'id'=>'text', 'cols'=>'30', 'rows'=>'5')),
+			'comment_start'	=>array('name'=>'comment_start', 'value'=>Arr::get($_POST, 'comment_start', ''), 'attr'=>array('desc'=>'Текст заказа', 'id'=>'comment_start', 'cols'=>'30', 'rows'=>'5')),
 		);
 
 		$data['columns']['detal'] = $this->columns['detal'];
 		$data['columns']['orders'] = $this->columns['orders'];
 		$data['columns']['startedorders'] = $this->columns['startedorders'];
-		
+
 		foreach ($data['columns']['detal'] as $key=>$val){
 			$data['colnames']['detal'][] = $val[0];
 		}
@@ -120,7 +160,7 @@ class Controller_Order extends Controller_Template {
 					'nizv',
 					'kodinstr',
 					'nizvins',
-					'text',
+					'comment_start',
 					'user_start',
 					'group_start'
 					))
@@ -131,7 +171,7 @@ class Controller_Order extends Controller_Template {
 							Arr::get($_POST, 'nizv'),
 							Arr::get($_POST, 'kodinstr'),
 							Arr::get($_POST, 'nizvins'),
-							Arr::get($_POST, 'text'),
+							Arr::get($_POST, 'comment_start'),
 							$this->user['login'],
 							$this->user['group']
 							));
@@ -142,9 +182,10 @@ class Controller_Order extends Controller_Template {
 				//$this->template->content = 'Ошибка добавления записи в базу.';
 			}
 		}
+		//echo var_dump($data);
 		$this->template->content = View::factory('order/start',$data);
 	}
-	
+
 	/*
 	 * Этот метод вызывается стандартными кнопками jqgrid
 	 * При нажатии кнопки jqgrid посылает $_POST['oper'] который может содержать del, edit или add
@@ -165,7 +206,7 @@ class Controller_Order extends Controller_Template {
 			$text = Arr::get($_POST, 'text');
 
 			$query = DB::select()->from('orders');
-		
+
 			$query->where_open()
 				->where_open()
 					->where('nosnas','=',$nosnas)
@@ -178,14 +219,14 @@ class Controller_Order extends Controller_Template {
 				->and_where('id', '<>', $id)
 				->and_where('status','IS', NULL);// Если деталь уже есть в невыданных заказах - не разрешаем добавление.
 												 // Если такая деталь уже присутствует в выданном заказе - то можно её запустить еще раз.
-			
+
 			$result = $query->execute()->as_array();
 			if(empty ($result)){
 				$query = DB::update('orders')
 						->set(array('kodinstr' => Arr::get($_POST,'kodinstr'),
 									'nosnas' => Arr::get($_POST,'nosnas'),
 									'nazvdet' => Arr::get($_POST,'nazvdet'),
-									'text' => Arr::get($_POST,'text'),
+									'comment_start' => Arr::get($_POST,'comment_start'),
 							))
 						->where('id', '=', $id);
 				$query->execute();
@@ -202,226 +243,48 @@ class Controller_Order extends Controller_Template {
 
 	/*
 	 * Вывод таблицы с деталями, которым не присвоен номер заказа.
-	 * Вызывается jqgrid'ом через ajax 
+	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_detal() {
-
 		$this->auto_render = false;
-
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS', NULL)
 				->and_where('status', 'IS', NULL)
 				->and_where('user_start', '=', $this->user['login']);
-		
-		// Добавляем условия для поиска
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-
-		$count = DB::query(Database::SELECT,$query)->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-		$query = DB::select()->from('orders')
-				->where('number','IS',NULL)
-				->and_where('status', 'IS', NULL)
-				->and_where('user_start', '=', $this->user['login'])
-				->order_by($sidx, $sord)->limit($limit)->offset($start);
-		
-		// Добавляем условия для поиска
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		//echo $query;
-		$result =$query->execute()->as_array();
-
-		// we should set the appropriate header information. Do not forget this.
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['detal']);
-		//print_r($fields);
-		// be sure to put text data in CDATA
-		foreach($result as $row) {
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
-
 	/*
 	 * Вывод таблицы с деталями, которым уже присвоен номер заказа.
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_orders() {
-
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
-		$query = DB::select()->from('orders')
-				->where('number', 'IS NOT', NULL)
-				->and_where('status', 'IS', NULL)
-				->and_where('user_start', '=', $this->user['login'])
-				//->and_where('status', '<>', 'Выдан')
-				;
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$count = $query->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-
 		$query = DB::select()->from('orders')
 				->where('number','IS NOT', NULL)
 				->and_where('user_start', '=', $this->user['login'])
-				->and_where('status', 'IS', NULL)
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$result = $query->execute()->as_array();
-		// we should set the appropriate header information. Do not forget this.
+				->and_where('status', 'IS', NULL);
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['orders']);
-		// be sure to put text data in CDATA
-		foreach($result as $row){
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
-	
 	/*
 	 * вывод таблицы с уже запущенными заказами
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_started() {
-
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
-		$query = DB::select()->from('orders')
-				->where('number', 'IS NOT', NULL)
-				->and_where('status', '=', 'Выдан');
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$count = $query->execute()->count();
-
-		// calculate the total pages for the query
-		if( $count > 0 && $limit > 0) {
-			$total_pages = ceil($count/$limit);
-		} else {
-			$total_pages = 0;
-		}
-
-		// if for some reasons the requested page is greater than the total
-		// set the requested page to total page
-		if ($page > $total_pages) $page=$total_pages;
-
-		// calculate the starting position of the rows
-		$start = $limit*$page - $limit;
-
-		// if for some reasons start position is negative set it to 0
-		// typical case is that the user type 0 for the requested page
-		if($start <0) $start = 0;
-
 		$query = DB::select()->from('orders')
 				->where('number','IS NOT', NULL)
-				->and_where('status', '=', 'Выдан')
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
-		$result = $query->execute()->as_array();
-		// we should set the appropriate header information. Do not forget this.
+				->and_where('status', '=', 'Выдан');
 		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
-
-		$s = "<?xml version='1.0' encoding='utf-8'?>";
-		$s .= "<rows>";
-		$s .= "<page>".$page."</page>";
-		$s .= "<total>".$total_pages."</total>";
-		$s .= "<records>".$count."</records>";
-
 		$fields = array_keys($this->columns['startedorders']);
-
-		// be sure to put text data in CDATA
-		foreach($result as $row) {
-			$s .= "<row id='". $row['id']."'>";
-			foreach($fields as $key=>$val) {
-				$s .= "<cell><![CDATA[". $row[$val]."]]></cell>";
-			}
-			$s .= "</row>";
-		}
-		$s .= "</rows>";
+		$s = $this->xmlforjqgrid($query, $fields);
 		$this->response->body($s);
 	}
-
 	/*
 	 * Добавление деталей в заказ
 	 * Вызывается через ajax
@@ -441,7 +304,6 @@ class Controller_Order extends Controller_Template {
 			echo 'Не выбрана ни одна деталь';
 		}
  	}
-	
 	/*
 	 * Удаление деталей из заказа
 	 * Вызывается через ajax
@@ -457,7 +319,6 @@ class Controller_Order extends Controller_Template {
 			echo 'Не выбрана ни одна деталь';
 		}
 	}
-
 	/*
 	 * Помечает заказ как запущенный, вызывается через ajax
 	 */
@@ -465,7 +326,7 @@ class Controller_Order extends Controller_Template {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
-			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
 			$id = $ids[0];
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
@@ -478,7 +339,6 @@ class Controller_Order extends Controller_Template {
 		}
 		else return FALSE;
 	}
-
 	/*
 	 * Добавляет условия для поиска в запрос.
 	 * @param $q Запрос, в который добавляются условия
@@ -496,32 +356,32 @@ class Controller_Order extends Controller_Template {
 				case 'ne': $q->$w($rule->field, '<>', $rule->data); break; // не равно
 				case 'lt': $q->$w($rule->field, '<', $rule->data); break; // меньше
 				case 'le': $q->$w($rule->field, '<=', $rule->data); break; // меньше или равно
-				case 'gt': $q->$w($rule->field, '>', $rule->data); break; // больше	
+				case 'gt': $q->$w($rule->field, '>', $rule->data); break; // больше
 				case 'ge': $q->$w($rule->field, '>=', $rule->data); break; // больше или равно
 				case 'bw': $q->$w($rule->field, 'LIKE', $rule->data.'%'); break; // начинается с
 				case 'bn': $q->$w($rule->field, 'NOT LIKE', $rule->data.'%'); break; // не начинается с
 				case 'ew': $q->$w($rule->field, 'LIKE', '%'.$rule->data); break; // заканчивается на
-				case 'en': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data); break; // не заканчивается на 
+				case 'en': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data); break; // не заканчивается на
 				case 'cn': $q->$w($rule->field, 'LIKE', '%'.$rule->data.'%'); break; // содержит
 				case 'nс': $q->$w($rule->field, 'NOT LIKE', '%'.$rule->data.'%'); break; // не содержит
 				case 'nu': $q->$w($rule->field, 'IS', NULL); break; // is null
 				case 'nn': $q->$w($rule->field, 'IS NOT', NULL); break; // is not null
 				case 'in': $q->$w($rule->field, 'IN', explode(',', $rule->data)); break; // находится в
 				case 'ni': $q->$w($rule->field, 'NOT IN', explode(',', $rule->data)); break; // не находится в
-				//default: 
+				//default:
 			}
 		}
 		$q->where_close();
 	}
-	
+
 	public function action_accept() {
-		
+
 		$data['title'] = 'Приемка заказа';
-		
+
 		$data['columns']['startedorders'] = $this->columns['startedorders'];
 
 		$data['columns']['acceptorders'] = $this->columns['acceptorders'];
-	
+
 		foreach ($data['columns']['startedorders'] as $key=>$val){
 			$data['colnames']['startedorders'][] = $val[0];
 		}
@@ -530,7 +390,7 @@ class Controller_Order extends Controller_Template {
 		}
 		$this->template->content = View::factory('order/accept',$data);
 	}
-	
+
 	/*
 	 * Помечает заказ как принятый, вызывается через ajax
 	 */
@@ -539,7 +399,7 @@ class Controller_Order extends Controller_Template {
 		//print_r($_POST);
 		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
-			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
 			$id = $ids[0];
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
@@ -564,7 +424,7 @@ class Controller_Order extends Controller_Template {
 		$this->auto_render = false;
 		if(!empty($_POST)) {
 			$ids = explode(',', $_POST['ids']);
-			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.			
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
 			$id = $ids[0];
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
@@ -587,22 +447,165 @@ class Controller_Order extends Controller_Template {
 	 * Вызывается jqgrid'ом через ajax
 	 */
 	public function action_tableaccepted() {
-
 		$this->auto_render = false;
-		$page = $_POST['page'];
-		$limit = $_POST['rows'];
-		$sidx = $_POST['sidx'];
-		$sord = $_POST['sord'];
-		if(!$sidx) $sidx =1;
-		// calculate the number of rows for the query. We need this for paging the result
 		$query = DB::select()->from('orders')
 				->where('number', 'IS NOT', NULL)
 				->and_where_open()
 					->where('status', '=', 'Принят')
 					->or_where('status', '=', 'Возврат')
 				->where_close();
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$fields = array_keys($this->columns['startedorders']);
+		$s = $this->xmlforjqgrid($query, $fields);
+		$this->response->body($s);
+	}
+	/*
+	 * Вывод таблицы планирования
+	 */
+	public function action_plan() {
+		$data['title'] = 'Планирование заказа';
+		$doers = '';
+		$query = DB::select()->from('users')
+				->where('group', '=', 'kbimo');
+		$result = $query->execute()->as_array();
+		foreach ($result as $key=>$val){
+			$doers .= $val['login'].':'.$val['f'].';';
+		}
+		$doers = substr($doers,0,-1);
+
+		$data['columns']['plan'] = $this->columns['plan'];
+		$data['columns']['plan']['doer']['values'] = $doers;
+		foreach ($data['columns']['plan'] as $key=>$val){
+			$data['colnames']['plan'][] = $val[0];
+		}
+		$this->template->content = View::factory('order/plan',$data);
+	}
+
+	/*
+	 * Помечает заказ как запланированный, вызывается jqgrid'ом через аякс.
+	 */
+	public function action_saveplan() {
+		$this->auto_render = false;
+		if(!empty($_POST)) {
+			$id = Arr::get($_POST,'id');
+			$doer_login = Arr::get($_POST,'doer');
+			$query = DB::select('f')->from('users')->where('login','=',$doer_login);
+			$doer_f = $query->execute()->get('f');
+
+			$query = DB::select('number')->from('orders')->where('id','=',$id);
+			$number = $query->execute()->get('number');
+
+			$query = DB::update('orders')
+					->set(array('date_plan'=>DB::expr('now()'), 'status'=>'План', 'doer'=>$doer_f))
+					->where('number','=',$number);
+			$query->execute();
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	/*
+	 * Вызывается jqgrid'ом для отрисовки таблицы заказов для планирования.
+	 */
+	public function action_tableplan() {
+		$this->auto_render = false;
+		$query = DB::select()->from('orders')
+				->where('number','IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Принят')
+					->or_where('status', '=', 'План')
+				->where_close();
+				//->group_by('number')
+		$fields = array_keys($this->columns['plan']);
+		$s = $this->xmlforjqgrid($query,$fields);
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$this->response->body($s);
+	}
+
+	/*
+	 * Вывод таблицы завершения заказа
+	 */
+	public function action_finish() {
+		$data['title'] = 'Заершение заказа';
+
+		$data['columns']['finish'] = $this->columns['finish'];
+		$data['columns']['finished'] = $this->columns['finish'];
+		foreach ($data['columns']['finish'] as $key=>$val){
+			$data['colnames']['finish'][] = $val[0];
+			$data['colnames']['finished'][] = $val[0];
+		}
+		$this->template->content = View::factory('order/finish',$data);
+	}
+	/*
+	 * Помечает заказ как готовый, вызывается через ajax
+	 */
+	public function action_finishorder() {
+		$this->auto_render = false;
+		//print_r($_POST);
+		if(!empty($_POST)) {
+			$ids = explode(',', $_POST['ids']);
+			//Если выбрано несколько строк - отбрасываем все, т.к. там может быть несколько номеров заказов.
+			$id = $ids[0];
+			$query = DB::select('number')->from('orders')->where('id','=',$id);
+			$number = $query->execute()->get('number');
+			//print_r($res->get('number'));
+			$query = DB::update('orders')
+					->set(array('date_finish'=>DB::expr('now()'), 'status'=>'Готов'))
+					->where('number','=',$number);
+			$query->execute();
+			// В одну из деталей заказ добавляем коментарий ко всему заказу.
+			$query = DB::update('orders')
+					->set(array('comment_finish'=>Arr::get($_POST,'comment_finish')))
+					->where('id','=',$id);
+			$query->execute();
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	/*
+	 * Вызывается jqgrid'ом для отрисовки таблицы заказов находящихся в работе.
+	 */
+	public function action_tablefinish() {
+		$this->auto_render = false;
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'План')
+				->where_close();
+
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$fields = array_keys($this->columns['finish']);
+		$s = $this->xmlforjqgrid($query,$fields);
+		$this->response->body($s);
+	}
+	/*
+	 * Вызывается jqgrid'ом для отрисовки таблицы готовых заказов.
+	 */
+	public function action_tablefinished() {
+		$this->auto_render = false;
+		$query = DB::select()->from('orders')
+				->where('number', 'IS NOT', NULL)
+				->and_where_open()
+					->where('status', '=', 'Готов')
+				->where_close();
+		// we should set the appropriate header information. Do not forget this.
+		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
+		$fields = array_keys($this->columns['finish']);
+		$s = $this->xmlforjqgrid($query,$fields);
+		$this->response->body($s);
+	}
+
+	private function xmlforjqgrid($query,$fields) {
+		$page = Arr::get($_POST,'page');
+		$limit = Arr::get($_POST,'rows');
+		$sidx = Arr::get($_POST,'sidx');
+		$sord = Arr::get($_POST,'sord');
+
+		if(!$sidx) $sidx =1;
+
+		// calculate the number of rows for the query. We need this for paging the result
 		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
+			$this->createwhere($query,json_decode(Arr::get($_POST,'filters')));
 		}
 		$count = $query->execute()->count();
 
@@ -624,27 +627,16 @@ class Controller_Order extends Controller_Template {
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
 
-		$query = DB::select()->from('orders')
-				->where('number','IS NOT', NULL)
-				->and_where_open()
-					->where('status', '=', 'Принят')
-					->or_where('status', '=', 'Возврат')
-				->where_close()				
-				->order_by($sidx,$sord)->limit($limit)->offset($start);
-		if($_POST['_search'] == 'true') {
-			$this->createwhere($query,json_decode($_POST['filters']));
-		}
+		// дополняем запрос условия сортировки и лимитами
+		$query->order_by($sidx,$sord)->limit($limit)->offset($start);
+
 		$result = $query->execute()->as_array();
-		// we should set the appropriate header information. Do not forget this.
-		$this->response->headers['Content-type'] = 'text/xml;charset=utf-8';//("Content-type: text/xml;charset=utf-8");
 
 		$s = "<?xml version='1.0' encoding='utf-8'?>";
 		$s .= "<rows>";
 		$s .= "<page>".$page."</page>";
 		$s .= "<total>".$total_pages."</total>";
 		$s .= "<records>".$count."</records>";
-
-		$fields = array_keys($this->columns['startedorders']);
 
 		// be sure to put text data in CDATA
 		foreach($result as $row) {
@@ -655,6 +647,6 @@ class Controller_Order extends Controller_Template {
 			$s .= "</row>";
 		}
 		$s .= "</rows>";
-		$this->response->body($s);
+		return $s;
 	}
 }
