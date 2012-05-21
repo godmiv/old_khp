@@ -24,6 +24,7 @@
 				<td><?php echo Html::anchor('order/accept','Приемка заказа');?></td>
 				<td><?php echo Html::anchor('order/plan','Планирование заказа');?></td>
 				<td><?php echo Html::anchor('order/finish','Завершение заказа');?></td>
+				<td><?php echo View::factory('user/login');?></td>
 			</tr>
 		</table>
 		<?=$content?>

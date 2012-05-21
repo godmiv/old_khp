@@ -7,7 +7,7 @@ class Controller_User extends Controller_Template {
 	public function action_index()
 	{
 		$data['text'] = 'text';
-		$this->template->content = View::factory('user',$data);
+		$this->template->content = View::factory('user/login',$data);
 	}
 	
 	public function action_login() {
@@ -21,9 +21,11 @@ class Controller_User extends Controller_Template {
 				->where('pass', '=', $pass);
 			$result = $query->execute()->as_array();
 			if(!$result) $data = 'Неверный пароль';
-			else $data = 'Авторизация пройдена';
-			$user = $result[0];
-			Session::instance()->set('user', $result[0]);
+			else {
+				$data = 'Авторизация пройдена';
+				$user = $result[0];
+				Session::instance()->set('user', $result[0]);
+			}
 			print_r(Session::instance()->as_array());
 		}
 		$this->response->body($data);
@@ -32,7 +34,11 @@ class Controller_User extends Controller_Template {
 	public function action_logout() {
 		$this->auto_render = false;
 		Session::instance()->delete('user');
-		//$this->request->redirect();
-		$this->response->body('ok');
+		$this->request->redirect();
+		//$this->response->body('ok');
+	}
+	
+	public function action_changepass() {
+		
 	}
 }
