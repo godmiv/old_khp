@@ -295,6 +295,12 @@ echo form::select('osin', $opt, $codifier_instr_selected, array('id'=>'osin'));
 </table>
 	<input type="hidden" name="showform" id="showform" value="" />
 	<?php echo form::close();?>
+<div id="file-uploader">
+    <noscript>
+        <p>Please enable JavaScript to use file uploader.</p>
+        <!-- or put a simple form for upload here -->
+    </noscript>
+</div>
 </div>
 
 <table id="detal"></table>

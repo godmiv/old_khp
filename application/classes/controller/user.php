@@ -14,6 +14,7 @@ class Controller_User extends Controller_Template {
 		$this->auto_render = false;
 		$login = Arr::get($_POST, 'login');
 		$pass = Arr::get($_POST, 'pass');
+		$url = Arr::get($_POST,'url');
 		$query = DB::select()->from('users')->where('login','=',$login);
 		if(!$query->execute()->get('pass')) $data = 'Неверный логин';
 		else {
@@ -26,9 +27,10 @@ class Controller_User extends Controller_Template {
 				$user = $result[0];
 				Session::instance()->set('user', $result[0]);
 			}
-			print_r(Session::instance()->as_array());
+			$this->request->redirect($url);
+			//print_r(Session::instance()->as_array());
 		}
-		$this->response->body($data);
+		//$this->response->body($data);
 	}
 	
 	public function action_logout() {

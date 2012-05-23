@@ -74,7 +74,7 @@ class Controller_Order extends Controller_Template {
 			'comment_accept'=>array('Коментарий конструктора','200'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
-			'doer'=>array('Исполнитель','100'),
+			'doer'=>array('Исполнитель','120'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
 		);
 		

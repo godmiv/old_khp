@@ -1,16 +1,4 @@
 <script type="text/javascript">
-/*
- *  Отправка данных по нажатию на "Enter"
- */
-/*
-$(document).ready(function() {
-     $(document).keyup(function(event) {
-        if (event.keyCode == 13) {
-         userlogin();
-        }
-    })
-});
-*/
 function userlogin(){
 	var l = $('#login').val();
 	var p = $('#pass').val();
@@ -36,11 +24,12 @@ function userlogin(){
 		<td><?php echo Form::input('login', '', array('id'=>'login','size'=>'10','maxlength'=>'100'));?></td>
 		<td style="text-align: right">Pass:</td>
 		<td><?php echo Form::password('pass', '', array('id'=>'pass','size'=>'10','maxlength'=>'100'));?></td>
-		<td><?php echo Form::input('submit', 'Войтить',array('type'=>'button', 'id'=>'btn_submit','onclick'=>'userlogin()'));?></td>
+		<td><?php echo Form::submit('ok', 'Войти');?></td>
 		<td>&nbsp;</td>
 	</tr>
 </table>
 </div>
+<?php echo Form::input('url', Request::current()->uri(), array('type'=>'hidden'));?>
 <?php echo Form::close()?>
 <?php else:?>
 Пользователь: <?php echo $sess['user']['f'];?>
