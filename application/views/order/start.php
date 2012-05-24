@@ -64,8 +64,9 @@ jQuery("#detal").jqGrid({
 	//autowidth: true,
 	height: "100%",
 	editurl: "<?php echo URL::base()?>order/edit",
-	multiselect: true
-
+	multiselect: true,
+	gridComplete: function(){
+	}
 });
 //jQuery("#grid").jqGrid('gridResize');
 
@@ -240,11 +241,17 @@ function startorder(){
 		});
 	}
 }
+function addfile(){
+	var s = jQuery("#detal").jqGrid('getGridParam','selarrrow');
+	if(s.length > 1) alert('Файл можно прикрепить только к одной детали');
+	else alert('ОК');
+}
 </script>
 <h3>Выдача заказов</h3>
 <input type="button" onclick="opendialog();" id="addbutton" value="Добавить деталь" />
 <input type="button" onclick="addtoorder();" value="Добавить детали в заказ" />
 <input type="button" onclick="delfromorder();" value="Удалить детали из заказа" />
+<input type="button" onclick="addfile();" value="Прикрепить файл" />
 <div id="dialog">
 <?php if (isset($errors)): ?>
 	<div class="ui-state-error ui-dialog-titlebar ui-corner-all ui-helper-clearfix">
