@@ -15,7 +15,6 @@
 		<?php echo HTML::script('assets/js/jquery-ui-1.8.18.custom.min.js'), PHP_EOL ?>
 
 		<?php echo HTML::script('assets/js/jsgantt.compressed.js'), PHP_EOL ?>
-
     </head>
     <body>
 		<table style="background-color:lightgray">
@@ -24,6 +23,7 @@
 				<td><?php echo Html::anchor('order/accept','Приемка заказа');?></td>
 				<td><?php echo Html::anchor('order/plan','Планирование заказа');?></td>
 				<td><?php echo Html::anchor('order/finish','Завершение заказа');?></td>
+				<td><?php echo View::factory('user/login');?></td>
 			</tr>
 		</table>
 		<?=$content?>
