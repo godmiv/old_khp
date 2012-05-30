@@ -9,6 +9,7 @@ class Controller_File extends Controller {
 
 	public function action_upload()
 	{
-		
+		print_r($_POST);
+		print_r($_FILES);
 	}
 }
