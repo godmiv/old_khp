@@ -25,7 +25,7 @@ class Controller_Order extends Controller_Template {
 			//'date_end'=>array('Дата сдачи заказа','100'),
 			'comment_start'=>array('Коментарий технолога','140','textarea'),//'text'=>array('Коментарий технолога','250','textarea'),
 		);
-		
+
 		$this->columns['startedorders'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','60'),
@@ -59,7 +59,7 @@ class Controller_Order extends Controller_Template {
 			'user_start'=>array('Выдал заказ','90'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
 		);
-		
+
 		$this->columns['plan'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -70,14 +70,14 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'comment_start'=>array('Коментарий технолога','200','textarea'),
-			'comment_accept'=>array('Коментарий конструктора','200'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			'doer'=>array('Исполнитель','120'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
 		);
-		
+
 		$this->columns['finish'] = array(
 			'id'=>array('ID','30'),
 			'number'=>array('№ заказа','70'),
@@ -88,8 +88,8 @@ class Controller_Order extends Controller_Template {
 			'nizv'=>array('Изв. оснастки','100'),
 			'kodinstr'=>array('Шифр инструмента','200'),
 			'nizvins'=>array('Изв. истр.','100'),
-			'comment_start'=>array('Коментарий технолога','200','textarea'),
-			'comment_accept'=>array('Коментарий конструктора','200'),
+			'comment_start'=>array('Коментарий технолога','150','textarea'),
+			'comment_accept'=>array('Коментарий конструктора','150'),
 			'date_start'=>array('Дата выдачи заказа','85'),
 			'user_start'=>array('Выдал заказ','100'),
 			'doer'=>array('Исполнитель','100'),
@@ -473,7 +473,7 @@ class Controller_Order extends Controller_Template {
 			$doers .= $val['login'].':'.$val['f'].';';
 		}
 		$doers = substr($doers,0,-1);
-		
+
 		$data['columns']['plan'] = $this->columns['plan'];
 		$data['columns']['plan']['doer']['values'] = $doers;
 		foreach ($data['columns']['plan'] as $key=>$val){
@@ -492,10 +492,10 @@ class Controller_Order extends Controller_Template {
 			$doer_login = Arr::get($_POST,'doer');
 			$query = DB::select('f')->from('users')->where('login','=',$doer_login);
 			$doer_f = $query->execute()->get('f');
-			
+
 			$query = DB::select('number')->from('orders')->where('id','=',$id);
 			$number = $query->execute()->get('number');
-			
+
 			$query = DB::update('orders')
 					->set(array('date_plan'=>DB::expr('now()'), 'status'=>'План', 'doer'=>$doer_f))
 					->where('number','=',$number);
@@ -561,7 +561,7 @@ class Controller_Order extends Controller_Template {
 			return TRUE;
 		}
 		else return FALSE;
-	}	
+	}
 	/*
 	 * Вызывается jqgrid'ом для отрисовки таблицы заказов находящихся в работе.
 	 */
@@ -600,9 +600,9 @@ class Controller_Order extends Controller_Template {
 		$limit = Arr::get($_POST,'rows');
 		$sidx = Arr::get($_POST,'sidx');
 		$sord = Arr::get($_POST,'sord');
-		
+
 		if(!$sidx) $sidx =1;
-		
+
 		// calculate the number of rows for the query. We need this for paging the result
 		if($_POST['_search'] == 'true') {
 			$this->createwhere($query,json_decode(Arr::get($_POST,'filters')));
@@ -626,12 +626,12 @@ class Controller_Order extends Controller_Template {
 		// if for some reasons start position is negative set it to 0
 		// typical case is that the user type 0 for the requested page
 		if($start <0) $start = 0;
-		
+
 		// дополняем запрос условия сортировки и лимитами
 		$query->order_by($sidx,$sord)->limit($limit)->offset($start);
 
 		$result = $query->execute()->as_array();
-		
+
 		$s = "<?xml version='1.0' encoding='utf-8'?>";
 		$s .= "<rows>";
 		$s .= "<page>".$page."</page>";
@@ -648,5 +648,5 @@ class Controller_Order extends Controller_Template {
 		}
 		$s .= "</rows>";
 		return $s;
-	}	
+	}
 }

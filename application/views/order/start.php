@@ -29,6 +29,7 @@ $(document).ready(function(){
 	)
 	//$("#box").resizable();
 	createdialog();
+	createdialogfile();
 	<?php if(isset ($_POST['showform'])) echo 'opendialog();';?>
 	$('#addbutton').focus();
 });
@@ -78,7 +79,7 @@ jQuery("#detal").jqGrid('navGrid','#pager',
 			if (result[0] == 'fail') {
 				return [false,result[1]]
 			} else {
-				return [true,result[2]]; 
+				return [true,result[2]];
 			}
 		 }
 	}, // edit options
@@ -188,6 +189,19 @@ function opendialog(){
 	$("#dialog").dialog('open');
 }
 
+function createdialogfile(){
+	$('#loadfile').dialog({
+		title: "Прикрепление файла",//тайтл, заголовок окна
+		width: 600,//ширина
+		height: 200,//высота
+		modal: true,//true - окно модальное, false - нет
+		autoOpen:false
+	})
+}
+function opendialogfile(){
+	$("#loadfile").dialog('open');
+}
+
 function addtoorder(){
 	var s=s1=z='';
 	s = jQuery("#detal").jqGrid('getGridParam','selarrrow');
@@ -244,9 +258,11 @@ function startorder(){
 function addfile(){
 	var s = jQuery("#detal").jqGrid('getGridParam','selarrrow');
 	if(s.length > 1) alert('Файл можно прикрепить только к одной детали');
+	else if(s.length < 1) alert('Нужно выбрать к какой детали прикрепить файл');
 	else {
 		// Выводим диалог выбора файлов, загружаем файлы на сервер...
-
+		$('#selectedrow').val(s);
+		opendialogfile();
 		alert('ОК');
 	}
 }
@@ -305,6 +321,15 @@ echo form::select('osin', $opt, $codifier_instr_selected, array('id'=>'osin'));
 	 <tr><td><?php echo form::submit('add','Добавить деталь')?></td><td></td></tr>
 </table>
 	<input type="hidden" name="showform" id="showform" value="" />
+	<?php echo form::close();?>
+
+</div>
+<div id="loadfile">
+	<?php echo Form::open( URL::base().'file/upload', array('id'=>'uploadform','enctype' => 'multipart/form-data' ) );?>
+	<?php echo Form::file('userfile',array('size'=>'45'));?>
+	<?php echo Form::submit('btnupload', 'Загрузить');?>
+	<?php echo Form::hidden('selectedrow', '0', array('id'=>'selectedrow'));?>
+	<?php echo Form::hidden('returnurl', URL::base().'order/start');?>
 	<?php echo form::close();?>
 </div>
 
