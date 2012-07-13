@@ -19,11 +19,16 @@ class Controller_File extends Controller {
 		if(!isset ($sess['user'])){
 			die('Пользователь не залогинен, нужно отсекать это раньше, а не во время записи файла.');
 		} else {
-			$pathname .= date('Y/m/d'). '/' . Arr::get($_POST, 'selectedrow') . '/';
-			$uploadfile = $pathname . basename($_FILES['userfile']['name']);
-			echo $pathname;
+			//$pathname .= date('Y/m/d'). '/' . Arr::get($_POST, 'selectedrow') . '/';
+			$pathname .= Arr::get($_POST, 'selectedrow') . '/';
+			$newFileName = md5(basename($_FILES['userfile']['name']));
+			$newFileExt = strrchr($_FILES['userfile']['name'], '.');
+			$descrFile = $pathname . $newFileName;// в файле без расширения будем записывать описание файла
+			$uploadfile = $pathname . $newFileName . $newFileExt;
+			echo $uploadfile;
 			if(!is_dir($pathname)) mkdir($pathname,0,true);
 			if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+				file_put_contents($descrFile, Arr::get($_POST,'description'));
 				echo "Файл корректен и был успешно загружен.\n";
 			} else {
 				echo "Файл не сохранен, чтото пошло не так... \n";

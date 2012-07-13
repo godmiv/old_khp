@@ -263,7 +263,7 @@ function addfile(){
 		// Выводим диалог выбора файлов, загружаем файлы на сервер...
 		$('#selectedrow').val(s);
 		opendialogfile();
-		alert('ОК');
+		//alert('ОК');
 	}
 }
 </script>
@@ -324,12 +324,14 @@ echo form::select('osin', $opt, $codifier_instr_selected, array('id'=>'osin'));
 	<?php echo form::close();?>
 
 </div>
+<?php echo URL::base();?>
 <div id="loadfile">
-	<?php echo Form::open( URL::base().'file/upload', array('id'=>'uploadform','enctype' => 'multipart/form-data' ) );?>
+	<?php echo Form::open( 'file/upload', array('id'=>'uploadform','enctype' => 'multipart/form-data' ) );?>
 	<?php echo Form::file('userfile',array('size'=>'45'));?>
+	Описание файла: <?php echo Form::input('description',NULL,array('size'=>'30'));?>
 	<?php echo Form::submit('btnupload', 'Загрузить');?>
 	<?php echo Form::hidden('selectedrow', '0', array('id'=>'selectedrow'));?>
-	<?php echo Form::hidden('returnurl', URL::base().'order/start');?>
+	<?php echo Form::hidden('returnurl', 'order/start');?>
 	<?php echo form::close();?>
 </div>
 
