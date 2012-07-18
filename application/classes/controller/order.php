@@ -24,6 +24,7 @@ class Controller_Order extends Controller_Template {
 			//'date_start'=>array('Дата выдачи заказа','100'),
 			//'date_end'=>array('Дата сдачи заказа','100'),
 			'comment_start'=>array('Коментарий технолога','140','textarea'),//'text'=>array('Коментарий технолога','250','textarea'),
+			'files'=>array('Файлы','50'),
 		);
 
 		$this->columns['startedorders'] = array(
@@ -595,6 +596,9 @@ class Controller_Order extends Controller_Template {
 		$this->response->body($s);
 	}
 
+	/*
+	 * Готовит xml для jqgrid на основе запроса $query, списка полей $fields
+	 */
 	private function xmlforjqgrid($query,$fields) {
 		$page = Arr::get($_POST,'page');
 		$limit = Arr::get($_POST,'rows');

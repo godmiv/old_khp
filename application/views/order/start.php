@@ -67,6 +67,15 @@ jQuery("#detal").jqGrid({
 	editurl: "<?php echo URL::base()?>order/edit",
 	multiselect: true,
 	gridComplete: function(){
+		var ids = jQuery("#detal").jqGrid('getDataIDs');
+		for(var i=0;i < ids.length;i++){
+			var cl = ids[i];
+			hr = "<a href = '<?php echo URL::base()?>file/showall/"+cl+"'>Просмотр</a>";
+			if(jQuery("#detal").getRowData(ids[i]).files == "1"){
+				jQuery("#detal").jqGrid('setRowData',ids[i],{files:hr});				
+			}
+			//alert (status);
+		}
 	}
 });
 //jQuery("#grid").jqGrid('gridResize');
@@ -324,7 +333,6 @@ echo form::select('osin', $opt, $codifier_instr_selected, array('id'=>'osin'));
 	<?php echo form::close();?>
 
 </div>
-<?php echo URL::base();?>
 <div id="loadfile">
 	<?php echo Form::open( 'file/upload', array('id'=>'uploadform','enctype' => 'multipart/form-data' ) );?>
 	<?php echo Form::file('userfile',array('size'=>'45'));?>
